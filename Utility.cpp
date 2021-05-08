@@ -42,13 +42,22 @@ bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 }
 
 int Utility::menu() {
-	std::cout << "Meni" << std::endl;
+	std::cout << "\n\nMeni" << std::endl;
 	std::cout << "1) Naloži sliko" << std::endl;
 	std::cout << "2) Poženi algoritem" << std::endl;
+	std::cout << "\n4) Testiranje" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
 
 	int selection;
 	std::cin >> selection;
 	return selection;
+}
+
+std::vector<char>* Utility::commonDictionary() {
+	std::vector<char>* v = new std::vector<char>;
+	for (int x = 0; x < 256; x++) {
+		v->push_back(static_cast<char>(x));
+	}
+	return v;
 }

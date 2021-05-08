@@ -3,6 +3,8 @@
 
 PNG_filters::PNG_filters(std::string fileName) : image(cv::imread(fileName)) {}
 
+PNG_filters::~PNG_filters() {}
+
 void PNG_filters::showImage() {
 	if (!image.empty()) {
 		cv::imshow("Prikaz slike", image);
@@ -49,12 +51,13 @@ short PNG_filters::filterPeath(short current, short left, short up, short leftUp
 	return (current - fPaeth(left, up, leftUp)) % 256;
 }
 
-std::vector<PNG_filters::Values*>* PNG_filters::algorithm() {
+std::vector<char>* PNG_filters::Encode() {
 	if (!isImage()) {
-		return;
+		return NULL;
 	}
 
-	std::vector<Values*> *vec = new std::vector<Values*>;
+	/*std::vector<Values*> *vec = new std::vector<Values*>;*/
+	std::vector<char>* vec = new std::vector<char>;
 
 	//cv::Size ms = image.size();
 	int height = image.size().height;
@@ -117,7 +120,12 @@ std::vector<PNG_filters::Values*>* PNG_filters::algorithm() {
 					}
 				}
 
-				vec->push_back(vl);
+				//vec->push_back(vl);
+				
+				//std::stringstream ss; 
+				//ss << vl->encodedValue;
+				vec->push_back(static_cast<char>(vl->sf));
+				vec->push_back(static_cast<char>(vl->encodedValue));
 
 				//results.push_back(current[z]);
 				//results.push_back(filterSub(current[z], left[z]));
@@ -132,6 +140,7 @@ std::vector<PNG_filters::Values*>* PNG_filters::algorithm() {
 		}
 	}
 
+	return vec;
 	//std::cout << "imagesize: " << image.size().height << std::endl;
 }
 

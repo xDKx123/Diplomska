@@ -25,7 +25,9 @@ public:
 		}
 	};
 
+	PNG_filters(int) {};
 	PNG_filters(std::string fileName);
+	~PNG_filters();
 	bool isImage();
 	void showImage();
 	short filterNone();
@@ -34,7 +36,7 @@ public:
 	short filterAverage(short  current, short  left, short  up);
 	short fPaeth(short left, short up, short leftUp);
 	short filterPeath(short  current, short left, short up, short leftUp);
-	std::vector<Values*>* algorithm();
+	std::vector<char>* Encode();
 
 };
 

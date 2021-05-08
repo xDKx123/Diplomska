@@ -4,8 +4,10 @@
 #include <atlstr.h>
 #include <locale>
 #include <chrono>
+#include <list>
 #include "PNG_filters.h"
 #include "Utility.h"
+#include "MTF.h"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -25,25 +27,113 @@ int main(int argc, char* argv) {
 
 		case 2:
 			if (pngFilters) {
-				std::chrono::time_point start = std::chrono::system_clock::now();
-				std::vector<PNG_filters::Values*>* v = pngFilters->algorithm();
-				std::chrono::time_point end = std::chrono::system_clock::now();
+				auto start = std::chrono::system_clock::now();
+				std::vector<char>* v = pngFilters->Encode();
+				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			
+				MTF* mtf = new MTF();
+				start = std::chrono::system_clock::now();
+				mtf->Encode(v);
+				end = std::chrono::system_clock::now();
+				std::cout << "Trajanje mtf: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+
+				v->clear();
+				delete v;
 			}
 			else {
 				std::cout << "Najprej naložite sliko." << std::endl;
 			}
 			break;
 
+		case 4: {
+			std::vector<char>* v = new std::vector<char>;
+			v->push_back('p');
+			v->push_back('a');
+			v->push_back('n');
+			v->push_back('a');
+			v->push_back('m');
+			v->push_back('a');
+
+
+			std::vector<char>* dict = new std::vector<char>;
+			dict->push_back('a');
+			dict->push_back('b');
+			dict->push_back('c');
+			dict->push_back('d');
+			dict->push_back('e');
+			dict->push_back('f');
+			dict->push_back('g');
+			dict->push_back('h');
+			dict->push_back('i');
+			dict->push_back('j');
+			dict->push_back('k');
+			dict->push_back('l');
+			dict->push_back('m');
+			dict->push_back('n');
+			dict->push_back('o');
+			dict->push_back('p');
+			dict->push_back('q');
+			dict->push_back('r');
+			dict->push_back('s');
+			dict->push_back('t');
+			dict->push_back('u');
+			dict->push_back('v');
+			dict->push_back('w');
+			dict->push_back('x');
+			dict->push_back('y');
+			dict->push_back('z');
+			MTF* mtf = new MTF(dict);
+
+			std::vector<int>* enc = mtf->Encode(v);
+
+
+
+			dict->clear();
+			dict->push_back('a');
+			dict->push_back('b');
+			dict->push_back('c');
+			dict->push_back('d');
+			dict->push_back('e');
+			dict->push_back('f');
+			dict->push_back('g');
+			dict->push_back('h');
+			dict->push_back('i');
+			dict->push_back('j');
+			dict->push_back('k');
+			dict->push_back('l');
+			dict->push_back('m');
+			dict->push_back('n');
+			dict->push_back('o');
+			dict->push_back('p');
+			dict->push_back('q');
+			dict->push_back('r');
+			dict->push_back('s');
+			dict->push_back('t');
+			dict->push_back('u');
+			dict->push_back('v');
+			dict->push_back('w');
+			dict->push_back('x');
+			dict->push_back('y');
+			dict->push_back('z');
+			mtf = new MTF(dict);
+
+			mtf->Decode(enc);
+
+			
+			}
+			break;
+
 		case 0:
 			running = false;
 			break;
+
 		default:
 			std::cout << "Napaèna izbira." << std::endl;
 			break;
 		}
-
-
 	}
 
 	delete pngFilters;

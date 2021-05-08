@@ -84,6 +84,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\David\Documents\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\David\Documents\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,10 +143,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opencv_world452.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MTF.cpp" />
     <ClCompile Include="PNG_filters.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
@@ -152,6 +156,7 @@
     <Image Include="images\sample_1280×853.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MTF.h" />
     <ClInclude Include="PNG_filters.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
