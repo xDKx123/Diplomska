@@ -8,6 +8,7 @@
 #include "PNG_filters.h"
 #include "Utility.h"
 #include "MTF.h"
+#include "bwt.hpp"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -32,6 +33,21 @@ int main(int argc, char* argv) {
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 			
+
+				//std::vector<char>m;
+				//m.push_back('p');
+				//m.push_back('a');
+				//m.push_back('n');
+				//m.push_back('a');
+				//m.push_back('m');
+				//m.push_back('a');
+
+				//start = std::chrono::system_clock::now();
+				//auto t = townsend::algorithm::bwtEncode(m.begin(), m.end());
+				//end = std::chrono::system_clock::now();
+				//std::cout << "Trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
 				mtf->Encode(v);

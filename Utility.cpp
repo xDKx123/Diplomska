@@ -1,5 +1,9 @@
 #include "Utility.h"
 
+/// <summary>
+/// Popup v katerem izberemo sliko
+/// </summary>
+/// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
 	try {
 
@@ -35,12 +39,22 @@ std::string Utility::getImage() {
 	}
 }
 
+/// <summary>
+/// Primerjava dveh slik
+/// </summary>
+/// <param name="image1">slika ena</param>
+/// <param name="image2">slika dva</param>
+/// <returns>true èe sta sliki enaki, sicer false</returns>
 bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 	if (!image1.empty() and !image2.empty()) {
 		return image1.data == image2.data;
 	}
 }
 
+/// <summary>
+/// Prikaz menija
+/// </summary>
+/// <returns>int - izbira</returns>
 int Utility::menu() {
 	std::cout << "\n\nMeni" << std::endl;
 	std::cout << "1) Naloži sliko" << std::endl;
@@ -54,6 +68,10 @@ int Utility::menu() {
 	return selection;
 }
 
+/// <summary>
+/// Vrne slovar, ki zajema vseh 256 znakov
+/// </summary>
+/// <returns>std::vector<char> - 256 znakov</returns>
 std::vector<char>* Utility::commonDictionary() {
 	std::vector<char>* v = new std::vector<char>;
 	for (int x = 0; x < 256; x++) {
