@@ -5,10 +5,12 @@
 #include <locale>
 #include <chrono>
 #include <list>
+
 #include "PNG_filters.h"
 #include "Utility.h"
 #include "MTF.h"
 #include "bwt.hpp"
+#include "Huffman.h"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -22,17 +24,18 @@ int main(int argc, char* argv) {
 
 	while (running) {
 		switch (Utility::menu()) {
-		case 1:
+		case 1: {
 			pngFilters = new PNG_filters(Utility::getImage());
+		}
 			break;
 
-		case 2:
+		case 2: {
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
 				std::vector<char>* v = pngFilters->Encode();
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-			
+
 
 				//std::vector<char>m;
 				//m.push_back('p');
@@ -45,7 +48,7 @@ int main(int argc, char* argv) {
 				//start = std::chrono::system_clock::now();
 				//auto t = townsend::algorithm::bwtEncode(m.begin(), m.end());
 				//end = std::chrono::system_clock::now();
-				//std::cout << "Trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				//std::cout << "trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
 				MTF* mtf = new MTF();
@@ -62,10 +65,11 @@ int main(int argc, char* argv) {
 			else {
 				std::cout << "Najprej naložite sliko." << std::endl;
 			}
+		}
 			break;
 
 		case 4: {
-			std::vector<char>* v = new std::vector<char>;
+			/*std::vector<char>* v = new std::vector<char>;
 			v->push_back('p');
 			v->push_back('a');
 			v->push_back('n');
@@ -138,7 +142,38 @@ int main(int argc, char* argv) {
 
 			mtf->Decode(enc);
 
+			*/
+
+
+			//std::vector<char>m;
+			//m.push_back('p');
+			//m.push_back('a');
+			//m.push_back('n');
+			//m.push_back('a');
+			//m.push_back('m');
+			//m.push_back('a');
+
+			//auto start = std::chrono::system_clock::now();
+			//auto t = townsend::algorithm::bwtEncode(m.begin(), m.end());
+			//auto end = std::chrono::system_clock::now();
+			//std::cout << "trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+
+
+			std::vector<char>* v = new std::vector<char>;
+			v->push_back('p');
+			v->push_back('a');
+			v->push_back('n');
+			v->push_back('a');
+			v->push_back('m');
+			v->push_back('a');
+
+
 			
+			Huffman::Encode(v);
+			
+			delete v;
 			}
 			break;
 

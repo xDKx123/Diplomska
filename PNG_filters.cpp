@@ -71,7 +71,7 @@ std::vector<char>* PNG_filters::Encode() {
 	//	std::cout << (*it)[0] << std::endl;
 	//}
 	 
-	 
+	//èez celotno sliko uporabi filter in vrstice ter primerjaj rezultate.
 	for (int x = 0; x < height; x++) {
 		for (int y = 0; y < width; y++) {
 			//std::cout << image.at(x, y) << std::endl;

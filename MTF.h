@@ -10,7 +10,7 @@ public:
 	MTF();
 	MTF(std::vector<char>* v);
 	~MTF();
-	std::vector<int>* Encode(std::vector<char>* input);
-	std::vector<char>* Decode(std::vector<int>* input);
+	std::vector<char>* Encode(std::vector<char>* input);
+	std::vector<char>* Decode(std::vector<char>* input);
 };
 

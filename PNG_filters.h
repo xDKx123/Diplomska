@@ -10,12 +10,12 @@ private:
 	cv::Mat image;
 	const cv::Vec3b nullCheck = NULL;
 public:
-	static enum class SelectedFilter
+	enum class SelectedFilter
 	{
 		None, Sub, Up, Average, Paeth
 	};
 
-	static struct Values {
+	struct Values {
 		SelectedFilter sf;
 		short encodedValue;
 

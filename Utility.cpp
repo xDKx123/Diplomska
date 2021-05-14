@@ -57,8 +57,9 @@ bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 /// <returns>int - izbira</returns>
 int Utility::menu() {
 	std::cout << "\n\nMeni" << std::endl;
-	std::cout << "1) Naloži sliko" << std::endl;
-	std::cout << "2) Poženi algoritem" << std::endl;
+	std::cout << "1) Naloži dokument" << std::endl;
+	std::cout << "2) Poženi kodiranje" << std::endl;
+	std::cout << "3) Poženi dekodiranje" << std::endl;
 	std::cout << "\n4) Testiranje" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
@@ -72,10 +73,25 @@ int Utility::menu() {
 /// Vrne slovar, ki zajema vseh 256 znakov
 /// </summary>
 /// <returns>std::vector<char> - 256 znakov</returns>
-std::vector<char>* Utility::commonDictionary() {
+std::vector<char>* Utility::commonDictionaryVector() {
 	std::vector<char>* v = new std::vector<char>;
 	for (int x = 0; x < 256; x++) {
 		v->push_back(static_cast<char>(x));
 	}
 	return v;
+}
+
+
+/// <summary>
+/// Vrne slovar, ki zajema vseh 256 znakov
+/// </summary>
+/// <returns>std::vector<char> - 256 znakov</returns>
+std::map<char, int> Utility::commonDictionaryMap() {
+
+	std::map<char, int> mp;
+	for (int x = 0; x < 256; x++) {
+		//v->push_back(static_cast<char>(x));
+		mp.insert(std::pair<char, int>( static_cast<char> (x), 0));
+	}
+	return mp;
 }
