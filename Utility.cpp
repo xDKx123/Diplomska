@@ -87,7 +87,7 @@ std::vector<char>* Utility::commonDictionaryVector() {
 /// </summary>
 /// <returns>std::vector<char> - 256 znakov</returns>
 std::map<char, int> Utility::commonDictionaryMap() {
-
+	
 	std::map<char, int> mp;
 	for (int x = 0; x < 256; x++) {
 		//v->push_back(static_cast<char>(x));

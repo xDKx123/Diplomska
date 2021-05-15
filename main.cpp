@@ -163,6 +163,9 @@ int main(int argc, char* argv) {
 
 			std::vector<char>* v = new std::vector<char>;
 			v->push_back('p');
+			v->push_back('p');
+			v->push_back('p');
+			v->push_back('p');
 			v->push_back('a');
 			v->push_back('n');
 			v->push_back('a');
@@ -170,8 +173,10 @@ int main(int argc, char* argv) {
 			v->push_back('a');
 
 
-			
-			Huffman::Encode(v);
+			Huffman* huf = new Huffman();
+			huf->Encode(v);
+
+			//Huffman::Encode(v);
 			
 			delete v;
 			}
