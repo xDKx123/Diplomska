@@ -8,6 +8,9 @@
 #include <list>
 #include <string>
 #include <map>
+#include <fstream>
+#include <filesystem>
+
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
@@ -23,6 +26,9 @@ public:
 	static int menu();
 	static std::vector<char>* commonDictionaryVector();
 	static std::map<char, int> commonDictionaryMap();
+
+	static double compressionFactor(std::string originalFile, std::string compressedFile);
+	static void writeToFile(int width, int height, std::map<char, std::vector<bool>> mp);
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
 };
 

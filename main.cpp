@@ -53,11 +53,16 @@ int main(int argc, char* argv) {
 
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
-				mtf->Encode(v);
+				std::vector<char>* mtfTransformed = mtf->Encode(v);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje mtf: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+				Huffman* hf = new Huffman();
 
+				start = std::chrono::system_clock::now();
+				hf->Encode(mtfTransformed);
+				end = std::chrono::system_clock::now();
+				std::cout << "Trajanje huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 				v->clear();
 				delete v;
@@ -289,6 +294,14 @@ int main(int argc, char* argv) {
 			}
 			break;
 
+		case 9: {
+			std::string file1 = Utility::getImage();
+			std::string file2 = Utility::getImage();
+
+			std::cout << "\nFile compression: " << Utility::compressionFactor(file1, file2) << std::endl;
+
+		}
+			  break;
 		case 0:
 			running = false;
 			break;

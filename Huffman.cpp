@@ -22,28 +22,30 @@ void Huffman::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root,
 	makeCodes(v, root->right, b1);
 }
 
-std::vector<std::pair<char, int>> Huffman::sortedVectorOfValues(std::map<char, int> mp) {
-	std::vector<std::pair<char, int>> vec;
-	for (std::map<char, int>::iterator it = mp.begin(); it != mp.end(); ++it) {
-		if (it->second != 0) {
-			vec.push_back(std::pair<char, int>(it->first, it->second));
-		}
-	}
+//std::vector<std::pair<char, int>> Huffman::sortedVectorOfValues(std::map<char, int> mp) {
+//	std::vector<std::pair<char, int>> vec;
+//	for (std::map<char, int>::iterator it = mp.begin(); it != mp.end(); ++it) {
+//		if (it->second != 0) {
+//			vec.push_back(std::pair<char, int>(it->first, it->second));
+//		}
+//	}
+//
+//	std::sort(vec.begin(), vec.end(), [](const std::pair<char, int>& a, const std::pair<char, int>& b) {return a.second < b.second; });
+//
+//	return vec;
+//}
 
-	std::sort(vec.begin(), vec.end(), [](const std::pair<char, int>& a, const std::pair<char, int>& b) {return a.second < b.second; });
-
-	return vec;
-}
-
-std::map<char, std::vector<bool>> Huffman::buildTree(std::vector<std::pair<char, int>> v)
+std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, int> v)
 {
 	std::map<char, std::vector<bool>> mp;
 
 	std::priority_queue<Node*, std::vector<Node*>, compare> prior_q;
 	
 	Node* l, * r, *top;
-	for (auto pair : v) {
-		prior_q.push(new Node(pair));
+	for (auto &pair : v) {
+		if (pair.second != 0) {
+			prior_q.push(new Node(pair));
+		}
 	}
 
 	while (prior_q.size() != 1) {
@@ -92,9 +94,9 @@ std::vector<bool>* Huffman::Encode(std::vector<char>* v) {
 
 	//mp.erase(std::remove_if(mp.begin(), mp.end(), [](std::pair<char, int> p) { return p.second != 0; }), mp.end());
 
-	std::vector<std::pair<char, int>> vec = sortedVectorOfValues(mp);
+	//std::vector<std::pair<char, int>> vec = sortedVectorOfValues(mp);
 
-	buildTree(vec);
+	buildTree(mp);
 
 	return b;
 }

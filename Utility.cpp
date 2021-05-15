@@ -61,6 +61,7 @@ int Utility::menu() {
 	std::cout << "2) Poženi kodiranje" << std::endl;
 	std::cout << "3) Poženi dekodiranje" << std::endl;
 	std::cout << "\n4) Testiranje" << std::endl;
+	std::cout << "\n9) Testiranje file comparrison" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
 
@@ -94,4 +95,35 @@ std::map<char, int> Utility::commonDictionaryMap() {
 		mp.insert(std::pair<char, int>( static_cast<char> (x), 0));
 	}
 	return mp;
+}
+
+double Utility::compressionFactor(std::string originalFile, std::string compressedFile)
+{
+	try {
+
+		if (originalFile.find(validImageFileExtension) and compressedFile.find(validEncryptedFileExtension)) {
+			return static_cast<double>(std::filesystem::file_size(static_cast<std::filesystem::path>(originalFile))) / static_cast<double>(std::filesystem::file_size(static_cast<std::filesystem::path>(compressedFile)));
+		}
+	}
+	catch (...) {
+	}
+	return 0.0;
+}
+
+void Utility::writeToFile(int width, int height, std::map<char, std::vector<bool>> mp)
+{
+	//dodaj zapise za glavo
+
+	for (auto x : mp) {
+		for (auto b : x.second) {
+			//klici write za bool
+		}
+	}
+
+	//Dodaj da se na koncu dadjo še simboli, da ves kje je eof
+
+	for (int x = 0; x < 7; x++) {
+		//write false
+	}
+	//write true;
 }
