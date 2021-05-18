@@ -15,7 +15,7 @@ BinReader::~BinReader()
 bool BinReader::readBit() {
 	if (counter == 8) {
 		input.read((char*)&byte, 1);
-		counter == 0;
+		counter = 0;
 	}
 
 	bool b = (byte >> counter) & 1;

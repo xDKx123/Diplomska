@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <string.h>
 #include <vector>
+#include <optional>
 
 class PNG_filters
 {
@@ -17,7 +18,14 @@ public:
 
 	struct Values {
 		SelectedFilter sf;
-		short encodedValue;
+		char encodedValue;
+		//std::vector<short> *values;
+
+		//Values(SelectedFilter sf,std::vector<short>* values) {
+		//	this->sf = sf;
+		//	this->values = values;
+		//}
+		//short encodedValue;
 
 		Values(short val) {
 			sf = SelectedFilter::None;
