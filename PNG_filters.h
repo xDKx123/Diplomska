@@ -38,5 +38,7 @@ public:
 	short filterPeath(short  current, short left, short up, short leftUp);
 	std::vector<char>* Encode();
 
-};
+	template<typename T>
+	std::vector<int>* runFilterToImage(T function);
 
+};
