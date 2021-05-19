@@ -82,9 +82,12 @@ int Utility::menu() {
 	std::cout << "1) Naloi dokument" << std::endl;
 	std::cout << "2) Poeni kodiranje" << std::endl;
 	std::cout << "3) Poeni dekodiranje" << std::endl;
-	std::cout << "\n4) Testiranje" << std::endl;
-	std::cout << "\n9) Testiranje file comparrison" << std::endl;
-	std::cout << "\n90) Testiranje filtrov" << std::endl;
+	std::cout << "\nTestiranje" << std::endl;
+	std::cout << "9) Testiranje file comparrison" << std::endl;
+	std::cout << "90) Testiranje filtrov PNG" << std::endl;
+	std::cout << "91) Testiranje transformacije BWT" << std::endl;
+	std::cout << "92) Testiranje transformacije MTF" << std::endl;
+	std::cout << "93) Testiranje algoritma Huffman" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
 

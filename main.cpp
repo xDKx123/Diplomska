@@ -158,12 +158,6 @@ int main(int argc, char* argv) {
 			//m.push_back('m');
 			//m.push_back('a');
 
-			//auto start = std::chrono::system_clock::now();
-			//auto t = townsend::algorithm::bwtEncode(m.begin(), m.end());
-			//auto end = std::chrono::system_clock::now();
-			//std::cout << "trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
 
 
 			std::vector<char>* v = new std::vector<char>;
@@ -274,15 +268,6 @@ int main(int argc, char* argv) {
 			v->push_back('f');
 			v->push_back('f');
 
-			//v->push_back('p');
-			//v->push_back('p');
-			//v->push_back('p');
-			//v->push_back('p');
-			//v->push_back('a');
-			//v->push_back('n');
-			//v->push_back('a');
-			//v->push_back('m');
-			//v->push_back('a');
 
 
 			Huffman* huf = new Huffman();
@@ -319,6 +304,35 @@ int main(int argc, char* argv) {
 			// 
 			//cv::imwrite("test.bmp", mat2);
 			std::cout << "Image is same: " << Utility::compareImages(mat1, mat2) <<std::endl;
+		}
+			   break;
+
+		case 91: {
+			//BWT
+			std::cout << "NOT YET IMPLEMENTED" << std::endl;
+		}
+			   break;
+
+		case 92: {
+			//MTF
+			std::vector<char>* v = new std::vector<char>;
+			v->push_back('p');
+			v->push_back('a');
+			v->push_back('n');
+			v->push_back('a');
+			v->push_back('m');
+			v->push_back('a');
+
+			MTF* mtf = new MTF();
+			std::vector<char>* res = mtf->Encode(v);
+
+			std::vector<char>* decodec = mtf->Encode(res);
+			
+		}
+			   break;
+		case 93: {
+			//Huffman
+			std::cout << "NOT YET IMPLEMENTED" << std::endl;
 		}
 			   break;
 		case 0:
