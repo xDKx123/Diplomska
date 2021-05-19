@@ -302,6 +302,25 @@ int main(int argc, char* argv) {
 
 		}
 			  break;
+
+		case 90: {
+			std::string file1 = Utility::getImage();
+
+			PNG_filters* png1 = new PNG_filters(file1);
+			cv::Size sz = png1->getSize();
+			cv::Mat mat1 = png1->getImage();
+
+			std::vector<char> *res = png1->Encode();
+
+			png1 = new PNG_filters(file1);
+			cv::Mat mat2 = png1->Decode(sz.width, sz.height, res);
+
+			//Utility::displayImage(mat1);
+			// 
+			//cv::imwrite("test.bmp", mat2);
+			std::cout << "Image is same: " << Utility::compareImages(mat1, mat2) <<std::endl;
+		}
+			   break;
 		case 0:
 			running = false;
 			break;

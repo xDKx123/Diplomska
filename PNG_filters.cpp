@@ -16,19 +16,19 @@ bool PNG_filters::isImage() {
 	return !image.empty();
 }
 
-short PNG_filters::filterNone() {
+short PNG_filters::filterNoneEncode() {
 	return 0;
 }
 
-short PNG_filters::filterSub(short current, short  left) {
+short PNG_filters::filterSubEncode(short current, short  left) {
 	return (current - left) % 256;
 }
 
-short PNG_filters::filterUp(short  current, short  up) {
+short PNG_filters::filterUpEncode(short  current, short  up) {
 	return (current-up) % 256;
 }
 
-short PNG_filters::filterAverage(short  current, short  left, short  up){
+short PNG_filters::filterAverageEncode(short  current, short  left, short  up){
 	return ((left + up) / 2) % 256;
 }
 
@@ -47,8 +47,33 @@ short PNG_filters::fPaeth(short left, short up, short leftUp) {
 	return leftUp;
 }
 
-short PNG_filters::filterPeath(short current, short left, short up, short leftUp){
+short PNG_filters::filterPeathEncode(short current, short left, short up, short leftUp){
 	return (current - fPaeth(left, up, leftUp)) % 256;
+}
+
+short PNG_filters::filterNoneDecode()
+{
+	return 0;
+}
+
+short PNG_filters::filterSubDecode(short diff, short left)
+{
+	return (left + diff) % 256 ;
+}
+
+short PNG_filters::filterUpDecode(short diff, short up)
+{
+	return up + diff;
+}
+
+short PNG_filters::filterAveragedecode(short diff, short left, short up)
+{
+	return 0;
+}
+
+short PNG_filters::filterPaethDecode(short diff, short left, short up, short leftup)
+{
+	return fPaeth(left, up, leftup) - diff;
 }
 
 std::vector<char>* PNG_filters::Encode() {
@@ -168,10 +193,10 @@ std::vector<char>* PNG_filters::Encode() {
 			leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
 
 			for (int z = 0; z < 3; z++) {
-				encodedSub->push_back(left != nullCheck ? filterSub(current[z], left[z]) : current[z]);
-				encodedUp->push_back(up != nullCheck ? filterUp(current[z], up[z]) : current[z]);
-				encodedAvg->push_back(left != nullCheck && up != nullCheck ? filterAverage(current[z], left[z], up[z]) : current[z]);
-				encodedPaeth->push_back(left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPeath(current[z], left[z], up[z], leftUp[z]) : current[z]);
+				encodedSub->push_back(left != nullCheck ? filterSubEncode(current[z], left[z]) : current[z]);
+				encodedUp->push_back(up != nullCheck ? filterUpEncode(current[z], up[z]) : current[z]);
+				encodedAvg->push_back(left != nullCheck && up != nullCheck ? filterAverageEncode(current[z], left[z], up[z]) : current[z]);
+				encodedPaeth->push_back(left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPeathEncode(current[z], left[z], up[z], leftUp[z]) : current[z]);
 			}
 		}
 	}
@@ -186,8 +211,56 @@ std::vector<char>* PNG_filters::Encode() {
 	//std::cout << "imagesize: " << image.size().height << std::endl;
 }
 
-template<typename T>
-std::vector<int>* PNG_filters::runFilterToImage(T function)
+cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 {
-	std::vector<int>* v = new std::vector<int>;
+	int index = 1;
+	int encoded = static_cast<int>(values->at(0));
+
+	//image = cv::Mat(width, height, CV_8UC3);
+	image = cv::Mat(cv::Size(width, height), CV_8UC3);
+
+	//cv::Vec3b current;
+	//image.push_back(current);
+	for (int x = 0; x < height; x++) {
+		for (int y = 0; y < width; y++) {
+			cv::Vec3b current;
+			cv::Vec3b left;
+			cv::Vec3b up;
+			cv::Vec3b leftUp;
+
+			left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
+			up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
+			leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
+
+			for (int z = 0; z < 3; z++, index++) {
+				if (encoded == static_cast<int>(SelectedFilter::Sub)) {
+					current[z] = left != nullCheck ? filterSubDecode(values->at(index), left[z]) : values->at(index);
+				}
+				else if (encoded == static_cast<int>(SelectedFilter::Up)) {
+					current[z] = up != nullCheck ? filterUpDecode(values->at(index), up[z]) : values->at(index);
+				}
+				else if (encoded == static_cast<int>(SelectedFilter::Average)) {
+
+				}
+				else if (encoded == static_cast<int>(SelectedFilter::Paeth))
+				{
+					current[z] = left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPaethDecode(values->at(index), left[z], up[z], leftUp[z]) : values->at(index);
+				}
+			}
+
+			image.at<cv::Vec3b>(x, y) = current;
+		}
+	}
+
+	return image;
+}
+
+cv::Size PNG_filters::getSize()
+{
+	return image.size();
+}
+
+cv::Mat PNG_filters::getImage()
+{
+	return image;
 }

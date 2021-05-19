@@ -22,6 +22,7 @@ public:
 
 
 	static std::string getImage();
+	static void displayImage(cv::Mat image);
 	static bool compareImages(cv::Mat image1, cv::Mat image2);
 	static int menu();
 	static std::vector<char>* commonDictionaryVector();

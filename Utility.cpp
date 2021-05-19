@@ -39,6 +39,11 @@ std::string Utility::getImage() {
 	}
 }
 
+void Utility::displayImage(cv::Mat image)
+{
+	cv::imshow("Test", image);
+}
+
 /// <summary>
 /// Primerjava dveh slik
 /// </summary>
@@ -47,7 +52,24 @@ std::string Utility::getImage() {
 /// <returns>true èe sta sliki enaki, sicer false</returns>
 bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 	if (!image1.empty() and !image2.empty()) {
-		return image1.data == image2.data;
+		for (int x = 0; x < image1.size().height; x++) {
+			for (int y = 0; y < image1.size().width; y++) {
+				cv::Vec3b v1 = image1.at<cv::Vec3b>(x, y);
+				cv::Vec3b v2 = image2.at<cv::Vec3b>(x, y);
+
+				for (int z = 0; z < 3; z++) {
+					if (v1[z] != v2[z]) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+		//return image1.data == image2.data;
+	}
+	else {
+
+		return false;
 	}
 }
 
@@ -62,6 +84,7 @@ int Utility::menu() {
 	std::cout << "3) Poženi dekodiranje" << std::endl;
 	std::cout << "\n4) Testiranje" << std::endl;
 	std::cout << "\n9) Testiranje file comparrison" << std::endl;
+	std::cout << "\n90) Testiranje filtrov" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
 
