@@ -29,7 +29,7 @@ short PNG_filters::filterUpEncode(short  current, short  up) {
 }
 
 short PNG_filters::filterAverageEncode(short  current, short  left, short  up){
-	return ((left + up) / 2) % MODULUS;
+	return (current - static_cast<short>(std::floor(((static_cast<double>(left + up)) / 2)))) % MODULUS;
 }
 
 short PNG_filters::fPaeth(short left, short up, short leftUp) {
@@ -66,9 +66,9 @@ short PNG_filters::filterUpDecode(short diff, short up)
 	return (up + diff) % MODULUS;
 }
 
-short PNG_filters::filterAveragedecode(short diff, short left, short up)
+short PNG_filters::filterAverageDecode(short diff, short left, short up)
 {
-	return 0;
+	return (diff + static_cast<short>(std::floor(((static_cast<double>(left + up)) / 2)))) % MODULUS;
 }
 
 short PNG_filters::filterPaethDecode(short diff, short left, short up, short leftup)
@@ -201,8 +201,8 @@ std::vector<char>* PNG_filters::Encode() {
 		}
 	}
 
-	vec->push_back(static_cast<char> (SelectedFilter::Paeth));
-	for (auto x : *encodedPaeth) {
+	vec->push_back(static_cast<char> (SelectedFilter::Average));
+	for (auto x : *encodedAvg) {
 		vec->push_back(static_cast<char> (x));
 	}
 
@@ -213,8 +213,22 @@ std::vector<char>* PNG_filters::Encode() {
 
 cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 {
+	//Preverimo èe je kolièina podatkov za zapis v sliko ustrezna
+	if (values->size() - 1 != width * height * 3) {
+		std::cerr << "Velikost ni pravilna" << std::endl;
+		image = NULL;
+		return image;
+	}
+
 	int index = 1;
 	int encoded = static_cast<int>(values->at(0));
+
+	//Preverimo, èe je pravilno nastavljen tip filtriranja slike.
+	if (encoded < 1 or encoded > 4) {
+		std::cerr << "Tip kodiranja ni doloèen pravilno" << std::endl;
+		image = NULL;
+		return image;
+	}
 
 	//image = cv::Mat(width, height, CV_8UC3);
 	image = cv::Mat(cv::Size(width, height), CV_8UC3);
@@ -240,7 +254,7 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 					current[z] = up != nullCheck ? filterUpDecode(values->at(index), up[z]) : values->at(index);
 				}
 				else if (encoded == static_cast<int>(SelectedFilter::Average)) {
-
+					current[z] =left != nullCheck && up != nullCheck ? filterAverageDecode(values->at(index), left[z], up[z]) : values->at(index);
 				}
 				else if (encoded == static_cast<int>(SelectedFilter::Paeth))
 				{
