@@ -21,15 +21,15 @@ short PNG_filters::filterNoneEncode() {
 }
 
 short PNG_filters::filterSubEncode(short current, short  left) {
-	return (current - left) % 256;
+	return (current - left) % MODULUS;
 }
 
 short PNG_filters::filterUpEncode(short  current, short  up) {
-	return (current-up) % 256;
+	return (current-up) % MODULUS;
 }
 
 short PNG_filters::filterAverageEncode(short  current, short  left, short  up){
-	return ((left + up) / 2) % 256;
+	return ((left + up) / 2) % MODULUS;
 }
 
 short PNG_filters::fPaeth(short left, short up, short leftUp) {
@@ -58,12 +58,12 @@ short PNG_filters::filterNoneDecode()
 
 short PNG_filters::filterSubDecode(short diff, short left)
 {
-	return (left + diff) % 256 ;
+	return (left + diff) % MODULUS;
 }
 
 short PNG_filters::filterUpDecode(short diff, short up)
 {
-	return up + diff;
+	return (up + diff) % MODULUS;
 }
 
 short PNG_filters::filterAveragedecode(short diff, short left, short up)
@@ -73,7 +73,7 @@ short PNG_filters::filterAveragedecode(short diff, short left, short up)
 
 short PNG_filters::filterPaethDecode(short diff, short left, short up, short leftup)
 {
-	return fPaeth(left, up, leftup) - diff;
+	return (fPaeth(left, up, leftup) + diff) % MODULUS;
 }
 
 std::vector<char>* PNG_filters::Encode() {
@@ -201,8 +201,8 @@ std::vector<char>* PNG_filters::Encode() {
 		}
 	}
 
-	vec->push_back(static_cast<char> (SelectedFilter::Sub));
-	for (auto x : *encodedSub) {
+	vec->push_back(static_cast<char> (SelectedFilter::Paeth));
+	for (auto x : *encodedPaeth) {
 		vec->push_back(static_cast<char> (x));
 	}
 

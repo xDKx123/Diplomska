@@ -5,6 +5,8 @@
 #include <vector>
 #include <optional>
 
+#define MODULUS 256
+
 class PNG_filters
 {
 private:
@@ -53,12 +55,8 @@ public:
 	PNG_filters(std::string fileName);
 	~PNG_filters();
 
-
 	std::vector<char>* Encode();
 	cv::Mat Decode(int width, int height, std::vector<char>* values);
-
-	template<typename T>
-	std::vector<int>* runFilterToImage(T function);
 
 	cv::Size getSize();
 	cv::Mat getImage();

@@ -10,12 +10,17 @@
 #include <map>
 #include <fstream>
 #include <filesystem>
+#include <random>
+#include <uuids.h>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+
 class Utility
 {
+private:
+	static std::string randomName();
 public:
 	inline static const std::string validImageFileExtension = ".bmp";
 	inline static const std::string validEncryptedFileExtension = ".bin";
@@ -29,7 +34,8 @@ public:
 	static std::map<char, int> commonDictionaryMap();
 
 	static double compressionFactor(std::string originalFile, std::string compressedFile);
-	static void writeToFile(int width, int height, std::map<char, std::vector<bool>> mp);
+	static void writeBinFile(int width, int height, std::map<char, std::vector<bool>> mp);
+	static void writeBmpFile(cv::Mat image);
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
 };
 

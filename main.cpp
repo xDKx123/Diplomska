@@ -300,9 +300,6 @@ int main(int argc, char* argv) {
 			png1 = new PNG_filters(file1);
 			cv::Mat mat2 = png1->Decode(sz.width, sz.height, res);
 
-			//Utility::displayImage(mat1);
-			// 
-			//cv::imwrite("test.bmp", mat2);
 			std::cout << "Image is same: " << Utility::compareImages(mat1, mat2) <<std::endl;
 		}
 			   break;

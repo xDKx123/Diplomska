@@ -1,5 +1,25 @@
 #include "Utility.h"
 
+std::string Utility::randomName()
+{
+	USES_CONVERSION;
+	GUID g;
+	HRESULT hCreateGuid = CoCreateGuid(&g);
+
+	OLECHAR* guidString;
+	StringFromCLSID(g, &guidString);
+
+	std::string pString = OLE2CA(static_cast<LPCOLESTR>(guidString));
+	//guidStr = pString;
+	//guidStr = guidStr.replace(guidStr.begin(), guidStr.end(), '-', '_').substr(1, guidStr.size() - 1);
+	
+	std::replace(pString.begin(), pString.end(), '-', '_');
+
+	std::string t = pString.substr(1, pString.length() - 2);
+
+	return pString.substr(1, pString.length() - 2);
+}
+
 /// <summary>
 /// Popup v katerem izberemo sliko
 /// </summary>
@@ -136,7 +156,7 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 	return 0.0;
 }
 
-void Utility::writeToFile(int width, int height, std::map<char, std::vector<bool>> mp)
+void Utility::writeBinFile(int width, int height, std::map<char, std::vector<bool>> mp)
 {
 	//dodaj zapise za glavo
 
@@ -152,4 +172,12 @@ void Utility::writeToFile(int width, int height, std::map<char, std::vector<bool
 		//write false
 	}
 	//write true;
+}
+
+void Utility::writeBmpFile(cv::Mat image)
+{
+	std::string fileName = randomName() + validImageFileExtension;
+
+	std::cout << cv::imwrite(fileName, image) ? ("Ustvarjena datoteka: " + fileName) : ("Napaka pri zapisu datoteke");
+	std::cout << std::endl;
 }
