@@ -11,6 +11,7 @@
 #include "MTF.h"
 #include "bwt.hpp"
 #include "Huffman.h"
+#include "Huffman.cpp"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -43,7 +44,7 @@ int main(int argc, char* argv) {
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje mtf: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
-				Huffman* hf = new Huffman();
+				Huffman<int>* hf = new Huffman<int>();
 
 				start = std::chrono::system_clock::now();
 				std::map<char, std::vector<bool>> tree;
@@ -67,6 +68,19 @@ int main(int argc, char* argv) {
 		}
 			break;
 
+
+		case 3: {
+			int width, height;
+			std::vector<bool>* data;
+			std::map<char, float> probability;
+
+			std::tie(width, height, data, probability) = Utility::readBinFile();
+
+			Huffman<float>* huffman = new Huffman<float>();
+			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
+
+		}
+			  break;
 		case 4: {
 			/*std::vector<char>* v = new std::vector<char>;
 			v->push_back('p');
@@ -264,7 +278,7 @@ int main(int argc, char* argv) {
 
 
 
-			Huffman* huf = new Huffman();
+			Huffman<int>* huf = new Huffman<int>();
 			huf->Encode(v);
 
 			//Huffman::Encode(v);
@@ -323,7 +337,55 @@ int main(int argc, char* argv) {
 			   break;
 		case 93: {
 			//Huffman
-			std::cout << "NOT YET IMPLEMENTED" << std::endl;
+			std::vector<char>* v = new std::vector<char>;
+			v->push_back('d');
+			v->push_back('a');
+			v->push_back('v');
+			v->push_back('i');
+			v->push_back('d');
+			v->push_back('u');
+			v->push_back('r');
+			v->push_back('s');
+			v->push_back('k');
+			v->push_back('a');
+			v->push_back('i');
+			v->push_back('v');
+			v->push_back('a');
+			v->push_back('n');
+			v->push_back('m');
+			v->push_back('a');
+			v->push_back('t');
+			v->push_back('e');
+			v->push_back('j');
+			v->push_back('k');
+			v->push_back('u');
+			v->push_back('j');
+			v->push_back('n');
+			v->push_back('e');
+			v->push_back('k');
+			v->push_back('e');
+
+			Huffman<int>* hff = new Huffman<int>();
+			
+			std::map<char, std::vector<bool>> tree;
+			std::map<char, float> probability;
+			std::tie(tree, probability) = hff->Encode(v);
+
+			delete hff;
+
+			Utility::writeBinFile(0, 0, v, tree, probability);
+
+			int width, height;
+			std::vector<bool>* data;
+			std::map<char, float> probability2;
+
+			std::tie(width, height, data, probability2) = Utility::readBinFile();
+
+			Huffman<float>* huffman = new Huffman<float>();
+			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
+
+
+			//std::cout << "NOT YET IMPLEMENTED" << std::endl;
 		}
 			   break;
 		case 0:

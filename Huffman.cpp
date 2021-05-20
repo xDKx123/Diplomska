@@ -2,7 +2,11 @@
 #include "Utility.h"
 
 
-void Huffman::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b)
+//template class Huffman<int>;
+//template class Huffman<float>;
+
+template<class T>
+void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b)
 {
 	if (!root) {
 		return;
@@ -35,7 +39,8 @@ void Huffman::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root,
 //	return vec;
 //}
 
-std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, int> v)
+template<class T>
+std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
 {
 	std::map<char, std::vector<bool>> mp;
 
@@ -55,7 +60,7 @@ std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, int> v)
 		r = prior_q.top();
 		prior_q.pop();
 
-		top = new Node(std::make_pair<std::optional<char>, int>({}, l->p.second + r->p.second));
+		top = new Node(std::make_pair<std::optional<char>, T>({}, l->p.second + r->p.second));
 
 		top->left = l;
 		top->right = r;
@@ -70,19 +75,21 @@ std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, int> v)
 	return mp;
 }
 
-std::map<char, float> Huffman::calculateProbability(std::map<char, int> mp, int all)
+template<class T>
+std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, std::map<char, std::vector<bool>> tree)
 {
 	std::map<char, float> cf;
 
-	for (auto p : mp) {
-		cf.insert(std::pair<char, float>(p.first, static_cast<float>(p.second) / all));
+	for (auto p : tree) {
+		cf.insert(std::pair<char, float>(p.first, static_cast<float>(mp[p.first]) / tree.size()));
 	}
 
-	return std::map<char, float>();
+	return cf;
 }
 
-
-std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::Encode(std::vector<char>* v) {
+template<class T>
+std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>::Encode(std::vector<char>* v)
+{
 	//class T::value_type s;
 	//std::cout << s << std::endl;
 	
@@ -103,7 +110,6 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::En
 		mp[c]++;
 	}
 
-	std::map<char, float> cf = calculateProbability(mp, mp.size());
 
 	//mp.erase(std::remove_if(mp.begin(), mp.end(), [](std::pair<char, int> p) { return p.second != 0; }), mp.end());
 
@@ -111,15 +117,35 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::En
 
 	std::map<char, std::vector<bool>> tree = buildTree(mp);
 
+	std::map<char, float> cf = calculateProbability(mp, tree);
+
 	return std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>>(tree, cf);
 }
 
+template<class T>
+std::vector<char>* Huffman<T>::Decode(int width, int height, std::vector<bool>* data, std::map<char, float> cf) {
+	std::vector<char>* c = new std::vector<char>;
 
-std::vector<char>* Huffman::Decode(int, int, std::vector<bool>*, std::map<char, float>) {
-	std::vector<char>* b = new std::vector<char>;
+	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
-	return b;
+	std::vector<bool> bols;
+	for (auto b : *data) {
+		bols.push_back(b);
+		
+		for (std::map<char, std::vector<bool>>::iterator it = tree.begin(); it != tree.end(); ++it) {
+			
+			if (it->second.size() == bols.size() and std::equal(it->second.begin(), it->second.end(), bols.begin())) {
+				c->push_back(it->first);
+				bols.clear();
+				break;
+			}
+		}
+	}
 
-
+	return c;
 }
 
+//void TemopraryFunction() {
+//	Huffman<int>hf1;
+//	Huffman<float>hf2;
+//}

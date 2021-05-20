@@ -171,7 +171,6 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 		binWriter->writeFloat(pair.second);
 	}
 
-
 	for (auto item : *items) {
 		for (auto v : encodedValues[item]) {
 			binWriter->writeBit(v);
@@ -198,8 +197,13 @@ void Utility::writeBmpFile(cv::Mat image)
 
 std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
 {
+	//NE DIRAJ KER DELA
 	std::string fileName = getImage();
 	BinReader* binReader = new BinReader(fileName);
+
+	for (int x = 0; x < 8; x++) {
+		binReader->readBit();
+	}
 
 	int width = binReader->readInt();
 	int height = binReader->readInt();
@@ -215,7 +219,7 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 		data->push_back(binReader->readBit());
 	}
 
-	for (int x = data->size() - 1; data->back() != 1; x--) {
+	while (data->back() != true) {
 		data->pop_back();
 	}
 
