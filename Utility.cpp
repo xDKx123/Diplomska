@@ -156,13 +156,25 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 	return 0.0;
 }
 
-void Utility::writeBinFile(int width, int height, std::map<char, std::vector<bool>> mp)
+void Utility::writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
+	std::string fileName = randomName() + validEncryptedFileExtension;
+	BinWriter* binWriter = new BinWriter(fileName);
 
-	for (auto x : mp) {
-		for (auto b : x.second) {
-			//klici write za bool
+	binWriter->writeInt(width);
+	binWriter->writeInt(height);
+
+	binWriter->writeInt(probability.size());
+	for (auto pair : probability) {
+		binWriter->writeByte(pair.first);
+		binWriter->writeFloat(pair.second);
+	}
+
+
+	for (auto item : *items) {
+		for (auto v : encodedValues[item]) {
+			binWriter->writeBit(v);
 		}
 	}
 
@@ -170,8 +182,14 @@ void Utility::writeBinFile(int width, int height, std::map<char, std::vector<boo
 
 	for (int x = 0; x < 7; x++) {
 		//write false
+		binWriter->writeBit(false);
 	}
+	binWriter->writeBit(true);
 	//write true;
+
+	std::cout << "Ustvarjan dokument: " << fileName << std::endl;
+
+	delete binWriter;
 }
 
 void Utility::writeBmpFile(cv::Mat image)

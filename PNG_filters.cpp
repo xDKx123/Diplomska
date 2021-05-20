@@ -88,8 +88,6 @@ std::vector<char>* PNG_filters::Encode() {
 	int height = image.size().height;
 	int width = image.size().width;
 
-	int c = 0;
-
 	/*std::vector<short> results(5);*/
 
 	//for (cv::MatIterator_<cv::Vec3b> it = image.begin<cv::Vec3b>(); it != image.end<cv::Vec3b>(); ++it) {

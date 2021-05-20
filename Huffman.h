@@ -28,11 +28,10 @@ private:
 	void makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b);
 	//std::vector<std::pair<char, int>> sortedVectorOfValues(std::map<char, int> mp);
 	std::map<char, std::vector<bool>> buildTree(std::map<char, int> v);
+	std::map<char, float> calculateProbability(std::map<char, int> mp, int all);
 
 public:
-	std::vector<bool>* Encode(std::vector<char>* v);
+	std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Encode(std::vector<char>* v);
 	std::vector<char>* Decode(std::vector<bool>* v);
-
-
 };
 

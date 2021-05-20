@@ -70,8 +70,19 @@ std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, int> v)
 	return mp;
 }
 
+std::map<char, float> Huffman::calculateProbability(std::map<char, int> mp, int all)
+{
+	std::map<char, float> cf;
 
-std::vector<bool>* Huffman::Encode(std::vector<char>* v) {
+	for (auto p : mp) {
+		cf.insert(std::pair<char, float>(p.first, static_cast<float>(p.second) / all));
+	}
+
+	return std::map<char, float>();
+}
+
+
+std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::Encode(std::vector<char>* v) {
 	//class T::value_type s;
 	//std::cout << s << std::endl;
 	
@@ -92,13 +103,15 @@ std::vector<bool>* Huffman::Encode(std::vector<char>* v) {
 		mp[c]++;
 	}
 
+	std::map<char, float> cf = calculateProbability(mp, mp.size());
+
 	//mp.erase(std::remove_if(mp.begin(), mp.end(), [](std::pair<char, int> p) { return p.second != 0; }), mp.end());
 
 	//std::vector<std::pair<char, int>> vec = sortedVectorOfValues(mp);
 
-	buildTree(mp);
+	std::map<char, std::vector<bool>> tree = buildTree(mp);
 
-	return b;
+	return std::make_tuple(tree, cf);
 }
 
 

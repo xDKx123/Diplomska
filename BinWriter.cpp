@@ -8,6 +8,7 @@ BinWriter::BinWriter(std::string path)
 BinWriter::~BinWriter()
 {
 	if (counter > 0) {
+		byte = '0';
 		input.write(&byte, 1);
 	}
 	input.close();

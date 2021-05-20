@@ -33,23 +33,9 @@ int main(int argc, char* argv) {
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
 				std::vector<char>* v = pngFilters->Encode();
+				cv::Size size = pngFilters->getSize();
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
-				//std::vector<char>m;
-				//m.push_back('p');
-				//m.push_back('a');
-				//m.push_back('n');
-				//m.push_back('a');
-				//m.push_back('m');
-				//m.push_back('a');
-
-				//start = std::chrono::system_clock::now();
-				//auto t = townsend::algorithm::bwtEncode(m.begin(), m.end());
-				//end = std::chrono::system_clock::now();
-				//std::cout << "trajanje bwt: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
 
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
@@ -60,12 +46,20 @@ int main(int argc, char* argv) {
 				Huffman* hf = new Huffman();
 
 				start = std::chrono::system_clock::now();
-				hf->Encode(mtfTransformed);
+				std::map<char, std::vector<bool>> tree;
+				std::map<char, float> probability;
+				std::tie(tree, probability) = hf->Encode(mtfTransformed);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+				start = std::chrono::system_clock::now();
+				Utility::writeBinFile(size.width, size.height, mtfTransformed, tree, probability);
+				end = std::chrono::system_clock::now();
+				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				v->clear();
 				delete v;
+				delete mtf;
+				delete hf;
 			}
 			else {
 				std::cout << "Najprej naložite sliko." << std::endl;

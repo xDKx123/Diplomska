@@ -13,6 +13,9 @@
 #include <random>
 #include <uuids.h>
 
+#include "BinReader.h"
+#include "BinWriter.h"
+
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
@@ -34,7 +37,7 @@ public:
 	static std::map<char, int> commonDictionaryMap();
 
 	static double compressionFactor(std::string originalFile, std::string compressedFile);
-	static void writeBinFile(int width, int height, std::map<char, std::vector<bool>> mp);
+	static void writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability);
 	static void writeBmpFile(cv::Mat image);
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
 };
