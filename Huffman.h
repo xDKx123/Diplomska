@@ -32,6 +32,6 @@ private:
 
 public:
 	std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Encode(std::vector<char>* v);
-	std::vector<char>* Decode(std::vector<bool>* v);
+	std::vector<char>* Decode(int, int, std::vector<bool>*, std::map<char, float>);
 };
 

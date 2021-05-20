@@ -178,14 +178,10 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 		}
 	}
 
-	//Dodaj da se na koncu dadjo še simboli, da ves kje je eof
-
 	for (int x = 0; x < 7; x++) {
-		//write false
 		binWriter->writeBit(false);
 	}
 	binWriter->writeBit(true);
-	//write true;
 
 	std::cout << "Ustvarjan dokument: " << fileName << std::endl;
 
@@ -198,4 +194,36 @@ void Utility::writeBmpFile(cv::Mat image)
 
 	std::cout << cv::imwrite(fileName, image) ? ("Ustvarjena datoteka: " + fileName) : ("Napaka pri zapisu datoteke");
 	std::cout << std::endl;
+}
+
+std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
+{
+	std::string fileName = getImage();
+	BinReader* binReader = new BinReader(fileName);
+
+	int width = binReader->readInt();
+	int height = binReader->readInt();
+
+	std::map<char, float> probability;
+	int probabilitySize = binReader->readInt();
+	for (int x = 0; x < probabilitySize; x++) {
+		probability.insert(std::pair<char, float>(binReader->readByte(), binReader->readFloat()));
+	}
+
+	std::vector<bool>* data = new std::vector<bool>;
+	while (!binReader->isEof()) {
+		data->push_back(binReader->readBit());
+	}
+
+	for (int x = data->size() - 1; data->back() != 1; x--) {
+		data->pop_back();
+	}
+
+	for (int x = 0; x < 8; x++) {
+		data->pop_back();
+	}
+
+	delete binReader;
+
+	return std::tuple<int, int, std::vector<bool>*, std::map<char, float>>(width, height, data, probability);
 }

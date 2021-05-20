@@ -39,6 +39,7 @@ public:
 	static double compressionFactor(std::string originalFile, std::string compressedFile);
 	static void writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability);
 	static void writeBmpFile(cv::Mat image);
+	static std::tuple<int, int, std::vector<bool>*, std::map<char, float>> readBinFile();
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
 };
 

@@ -12,6 +12,8 @@ public:
 	BinReader(std::string path);
 	~BinReader();
 
+	bool isEof();
+
 	bool readBit();
 	char readByte();
 	int readInt();

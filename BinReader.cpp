@@ -28,6 +28,11 @@ char BinReader::readByte() {
 	return byte;
 }
 
+bool BinReader::isEof()
+{
+	return input.eof();
+}
+
 int BinReader::readInt() {
 	int i;
 	input.read((char*)&i, 4);

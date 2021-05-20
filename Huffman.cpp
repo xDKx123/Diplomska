@@ -111,11 +111,11 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::En
 
 	std::map<char, std::vector<bool>> tree = buildTree(mp);
 
-	return std::make_tuple(tree, cf);
+	return std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>>(tree, cf);
 }
 
 
-std::vector<char>* Huffman::Decode(std::vector<bool>* v) {
+std::vector<char>* Huffman::Decode(int, int, std::vector<bool>*, std::map<char, float>) {
 	std::vector<char>* b = new std::vector<char>;
 
 	return b;
