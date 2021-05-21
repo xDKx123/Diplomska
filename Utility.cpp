@@ -1,5 +1,9 @@
 #include "Utility.h"
 
+/// <summary>
+/// Funkcija zgenerira nakljuèno ime
+/// </summary>
+/// <returns></returns>
 std::string Utility::randomName()
 {
 	USES_CONVERSION;
@@ -59,6 +63,10 @@ std::string Utility::getImage() {
 	}
 }
 
+/// <summary>
+/// Prikaz slike
+/// </summary>
+/// <param name="image">slika, ki jo želimo prikazati</param>
 void Utility::displayImage(cv::Mat image)
 {
 	cv::imshow("Test", image);
@@ -145,6 +153,12 @@ std::map<char, int> Utility::commonDictionaryMap() {
 	return mp;
 }
 
+/// <summary>
+/// Funkcija vrne razmeje med originalno sliko, ter stiskano datoteko
+/// </summary>
+/// <param name="originalFile"></param>
+/// <param name="compressedFile"></param>
+/// <returns></returns>
 double Utility::compressionFactor(std::string originalFile, std::string compressedFile)
 {
 	try {
@@ -158,6 +172,14 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 	return 0.0;
 }
 
+/// <summary>
+/// Zapis podatkov v binarno datoteko
+/// </summary>
+/// <param name="width">širina slika</param>
+/// <param name="height">višina slike</param>
+/// <param name="items">slikovni podatki</param>
+/// <param name="encodedValues">binarni podatki posameznega znaka</param>
+/// <param name="probability">verjetnostna tabela</param>
 void Utility::writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
@@ -189,6 +211,10 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 	delete binWriter;
 }
 
+/// <summary>
+/// Ustvari bmp sliko
+/// </summary>
+/// <param name="image">slika, ki jo želimo zapisati na disk</param>
 void Utility::writeBmpFile(cv::Mat image)
 {
 	std::string fileName = randomName() + validImageFileExtension;
@@ -201,6 +227,10 @@ void Utility::writeBmpFile(cv::Mat image)
 	}
 }
 
+/// <summary>
+/// Branje binarne datoteke
+/// </summary>
+/// <returns>širina, višina, verjetnostna tabela, slikovni podatki</returns>
 std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
 {
 	//NE DIRAJ KER DELA
@@ -220,7 +250,7 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 	for (int x = 0; x < probabilitySize; x++) {
 		char c = binReader->readByte();
 		float f = binReader->readFloat();
-		probability.insert(std::pair<char, float>(c, f));
+		probability.insert(std::pair<char, float>(c,f));
 	}
 
 	std::vector<bool>* data = new std::vector<bool>;
@@ -241,6 +271,10 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 	return std::tuple<int, int, std::vector<bool>*, std::map<char, float>>(width, height, data, probability);
 }
 
+/// <summary>
+/// Funkcija, ki spremeni velikost slike
+/// </summary>
+/// <param name="fileName"></param>
 void Utility::resizeImage(std::string fileName)
 {
 	cv::Mat image(cv::imread(fileName));

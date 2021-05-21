@@ -33,7 +33,6 @@ private:
 	};
 
 	cv::Mat image;
-	const cv::Vec3b nullCheck = NULL;
 
 	bool isImage();
 	void showImage();
@@ -50,6 +49,7 @@ private:
 	short filterAverageDecode(short diff, short left, short up);
 	short filterPaethDecode(short diff, short left, short up, short leftup);
 public:
+	static inline const cv::Vec3b nullCheck = NULL;
 	PNG_filters();
 	PNG_filters(std::string fileName);
 	~PNG_filters();

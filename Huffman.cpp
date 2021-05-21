@@ -5,6 +5,13 @@
 //template class Huffman<int>;
 //template class Huffman<float>;
 
+/// <summary>
+/// Za vsak znak dobimo njegov binarni zapis
+/// </summary>
+/// <typeparam name="T">float - verjetnostna tabela, int - število pojavitev</typeparam>
+/// <param name="v">znaki z njihovimi podatki</param>
+/// <param name="root">koren</param>
+/// <param name="b">binarni vektor</param>
 template<class T>
 void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b)
 {
@@ -39,6 +46,12 @@ void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* ro
 //	return vec;
 //}
 
+/// <summary>
+/// Zgradimo Huffmanovo dravo
+/// </summary>
+/// <typeparam name="T">float - verjetnostna tabela, int - število pojavitev</typeparam>
+/// <param name="v">verjetnostna tabela / tabela, ki šteje pojavitve</param>
+/// <returns></returns>
 template<class T>
 std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
 {
@@ -75,6 +88,13 @@ std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
 	return mp;
 }
 
+/// <summary>
+/// Za vsak znak zraèuna verjetnost pojavitve
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="mp">pojavitvena tabela</param>
+/// <param name="tree">zgrajeno drevo</param>
+/// <returns></returns>
 template<class T>
 std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, std::map<char, std::vector<bool>> tree)
 {
@@ -87,6 +107,12 @@ std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, s
 	return cf;
 }
 
+/// <summary>
+/// Huffmanovo kodiranje
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="v">slikovni podatki</param>
+/// <returns>tabela z binarnimi podatki znakov, verjetnostna tabela</returns>
 template<class T>
 std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>::Encode(std::vector<char>* v)
 {
@@ -122,8 +148,15 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 	return std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>>(tree, cf);
 }
 
+/// <summary>
+/// Huffmanovo dekodiranje
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="data">binarni podatki</param>
+/// <param name="cf">verjetnostna tabela</param>
+/// <returns>slikovni podatki</returns>
 template<class T>
-std::vector<char>* Huffman<T>::Decode(int width, int height, std::vector<bool>* data, std::map<char, float> cf) {
+std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, float> cf) {
 	std::vector<char>* c = new std::vector<char>;
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);

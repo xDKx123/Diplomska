@@ -16,6 +16,10 @@ void PNG_filters::showImage() {
 	}
 }
 
+/// <summary>
+/// Preverimo èe imamo vnešeno sliko
+/// </summary>
+/// <returns></returns>
 bool PNG_filters::isImage() {
 	return !image.empty();
 }
@@ -80,6 +84,10 @@ short PNG_filters::filterPaethDecode(short diff, short left, short up, short lef
 	return (fPaeth(left, up, leftup) + diff) % MODULUS;
 }
 
+/// <summary>
+/// Zakodiramo celotno sliko z izbranim filtrom
+/// </summary>
+/// <returns>zakodirani podatki</returns>
 std::vector<char>* PNG_filters::Encode() {
 	if (!isImage()) {
 		return NULL;
@@ -213,6 +221,13 @@ std::vector<char>* PNG_filters::Encode() {
 	//std::cout << "imagesize: " << image.size().height << std::endl;
 }
 
+/// <summary>
+/// Dekodiramo sliko z izbranim filtrom
+/// </summary>
+/// <param name="width">širina slike</param>
+/// <param name="height">višina slike</param>
+/// <param name="values">slikovni podatki</param>
+/// <returns></returns>
 cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 {
 	//Preverimo èe je kolièina podatkov za zapis v sliko ustrezna

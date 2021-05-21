@@ -90,7 +90,7 @@ int main(int argc, char* argv) {
 			Huffman<float>* huffman = new Huffman<float>();
 
 			start = std::chrono::system_clock::now();
-			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
+			std::vector<char>* chars = huffman->Decode(data, probability);
 			end = std::chrono::system_clock::now();
 			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -237,7 +237,7 @@ int main(int argc, char* argv) {
 			std::tie(width, height, data, probability2) = Utility::readBinFile();
 
 			Huffman<float>* huffman = new Huffman<float>();
-			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
+			std::vector<char>* chars = huffman->Decode(data, probability);
 
 			MTF* mtf = new MTF();
 			std::vector<char>* mtfDec = mtf->Decode(chars);
