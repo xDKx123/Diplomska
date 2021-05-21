@@ -2,7 +2,6 @@
 #include "Utility.h"
 
 MTF::MTF() : commonDict(Utility::commonDictionaryVector()) {}
-MTF::MTF(std::vector<char>* v) : commonDict(v) {}
 //MTF::MTF(std::vector<char>* v, std::vector<char>* v1) : input(v), commonDict(v1) {}
 
 MTF::~MTF() {}
@@ -41,8 +40,14 @@ std::vector<char>* MTF::Decode(std::vector<char>* input) {
 
 	for (auto i : *input) {
 		//char c = commonDict->at(i);
-		std::vector<char>::iterator it = std::next(commonDict->begin(), static_cast<int>(i));
+		//std::cout << static_cast<int>(i) << std::endl;
+
+		int position = static_cast<int> (i);
+
+		std::vector<char>::iterator it = std::next(commonDict->begin(), position < 0 ? position + 256 : position);
 		//std::list<char>::iterator c = std::next(commonDict->begin(), i);
+		//char c =*it;
+		//std::cout << "C: " << c << std::endl;
 		v->push_back(*it);
 		//std::list<char>::iterator it = std::find(commonDict->begin(), commonDict->end(), *c);
 

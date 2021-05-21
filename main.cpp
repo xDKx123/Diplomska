@@ -44,6 +44,8 @@ int main(int argc, char* argv) {
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje mtf: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+
+
 				Huffman<int>* hf = new Huffman<int>();
 
 				start = std::chrono::system_clock::now();
@@ -58,6 +60,9 @@ int main(int argc, char* argv) {
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				v->clear();
+
+				std::cout << size.width << " " << size.height <<" " << mtfTransformed->size() << std::endl;
+
 				delete v;
 				delete mtf;
 				delete hf;
@@ -74,218 +79,50 @@ int main(int argc, char* argv) {
 			std::vector<bool>* data;
 			std::map<char, float> probability;
 
+			auto start = std::chrono::system_clock::now();
 			std::tie(width, height, data, probability) = Utility::readBinFile();
+			auto end = std::chrono::system_clock::now();
+			std::cout << "Trajanje branja binarne datoteke: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+			std::cout << "data: " << data->size() << std::endl;
 
 			Huffman<float>* huffman = new Huffman<float>();
+
+			start = std::chrono::system_clock::now();
 			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
+			end = std::chrono::system_clock::now();
+			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+			std::cout << "data: " << chars->size() << std::endl;
+
+			MTF* mtf = new MTF();
+			start = std::chrono::system_clock::now();
+			std::vector<char>* mtfDecode = mtf->Decode(chars);
+			end = std::chrono::system_clock::now();
+			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+			std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
+
+			PNG_filters* png = new PNG_filters();
+
+			start = std::chrono::system_clock::now();
+			cv::Mat image = png->Decode(width, height, mtfDecode);
+			end = std::chrono::system_clock::now();
+			std::cout << "Trajanje png dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			Utility::writeBmpFile(image);
 
 		}
 			  break;
+
 		case 4: {
-			/*std::vector<char>* v = new std::vector<char>;
-			v->push_back('p');
-			v->push_back('a');
-			v->push_back('n');
-			v->push_back('a');
-			v->push_back('m');
-			v->push_back('a');
+			std::string file = Utility::getImage();
 
-
-			std::vector<char>* dict = new std::vector<char>;
-			dict->push_back('a');
-			dict->push_back('b');
-			dict->push_back('c');
-			dict->push_back('d');
-			dict->push_back('e');
-			dict->push_back('f');
-			dict->push_back('g');
-			dict->push_back('h');
-			dict->push_back('i');
-			dict->push_back('j');
-			dict->push_back('k');
-			dict->push_back('l');
-			dict->push_back('m');
-			dict->push_back('n');
-			dict->push_back('o');
-			dict->push_back('p');
-			dict->push_back('q');
-			dict->push_back('r');
-			dict->push_back('s');
-			dict->push_back('t');
-			dict->push_back('u');
-			dict->push_back('v');
-			dict->push_back('w');
-			dict->push_back('x');
-			dict->push_back('y');
-			dict->push_back('z');
-			MTF* mtf = new MTF(dict);
-
-			std::vector<int>* enc = mtf->Encode(v);
-
-
-
-			dict->clear();
-			dict->push_back('a');
-			dict->push_back('b');
-			dict->push_back('c');
-			dict->push_back('d');
-			dict->push_back('e');
-			dict->push_back('f');
-			dict->push_back('g');
-			dict->push_back('h');
-			dict->push_back('i');
-			dict->push_back('j');
-			dict->push_back('k');
-			dict->push_back('l');
-			dict->push_back('m');
-			dict->push_back('n');
-			dict->push_back('o');
-			dict->push_back('p');
-			dict->push_back('q');
-			dict->push_back('r');
-			dict->push_back('s');
-			dict->push_back('t');
-			dict->push_back('u');
-			dict->push_back('v');
-			dict->push_back('w');
-			dict->push_back('x');
-			dict->push_back('y');
-			dict->push_back('z');
-			mtf = new MTF(dict);
-
-			mtf->Decode(enc);
-
-			*/
-
-
-			//std::vector<char>m;
-			//m.push_back('p');
-			//m.push_back('a');
-			//m.push_back('n');
-			//m.push_back('a');
-			//m.push_back('m');
-			//m.push_back('a');
-
-
-
-			std::vector<char>* v = new std::vector<char>;
-			v->push_back('a');
-			v->push_back('a');
-			v->push_back('a');
-			v->push_back('a');
-			v->push_back('a');
-
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-			v->push_back('b');
-
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-			v->push_back('c');
-
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-
-
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-			v->push_back('f');
-
-
-
-			Huffman<int>* huf = new Huffman<int>();
-			huf->Encode(v);
-
-			//Huffman::Encode(v);
-			
-			delete v;
-			}
-			break;
+			Utility::resizeImage(file);
+		}
+			  break;
 
 		case 9: {
 			std::string file1 = Utility::getImage();
@@ -331,49 +168,67 @@ int main(int argc, char* argv) {
 			MTF* mtf = new MTF();
 			std::vector<char>* res = mtf->Encode(v);
 
-			std::vector<char>* decodec = mtf->Encode(res);
+			delete mtf;
+
+			mtf = new MTF();
+
+			std::vector<char>* decodec = mtf->Decode(res);
+
+			std::cout << std::endl;
 			
 		}
 			   break;
 		case 93: {
 			//Huffman
 			std::vector<char>* v = new std::vector<char>;
-			v->push_back('d');
-			v->push_back('a');
-			v->push_back('v');
-			v->push_back('i');
-			v->push_back('d');
-			v->push_back('u');
-			v->push_back('r');
-			v->push_back('s');
-			v->push_back('k');
-			v->push_back('a');
-			v->push_back('i');
-			v->push_back('v');
-			v->push_back('a');
-			v->push_back('n');
-			v->push_back('m');
-			v->push_back('a');
 			v->push_back('t');
 			v->push_back('e');
-			v->push_back('j');
-			v->push_back('k');
-			v->push_back('u');
-			v->push_back('j');
-			v->push_back('n');
+			v->push_back('s');
+			v->push_back('t');
+			v->push_back('1');
+			v->push_back('2');
+			v->push_back('3');
+			v->push_back('a');
+			v->push_back('b');
+			v->push_back('c');
+			v->push_back('d');
 			v->push_back('e');
-			v->push_back('k');
+			v->push_back('f');
+			v->push_back('\n');
+			v->push_back('\n');
+			v->push_back('d');
+			v->push_back('d');
+			v->push_back('d');
+			v->push_back('d');
 			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+			v->push_back('e');
+
+			MTF* mtf1 = new MTF();
+			std::vector<char>* mtf1Dec = mtf1->Encode(v);
 
 			Huffman<int>* hff = new Huffman<int>();
 			
 			std::map<char, std::vector<bool>> tree;
 			std::map<char, float> probability;
-			std::tie(tree, probability) = hff->Encode(v);
+			std::tie(tree, probability) = hff->Encode(mtf1Dec);
 
 			delete hff;
 
-			Utility::writeBinFile(0, 0, v, tree, probability);
+			Utility::writeBinFile(0, 0, mtf1Dec, tree, probability);
+
+			std::cout << "mtf: " << mtf1Dec->size() << std::endl;
 
 			int width, height;
 			std::vector<bool>* data;
@@ -384,7 +239,10 @@ int main(int argc, char* argv) {
 			Huffman<float>* huffman = new Huffman<float>();
 			std::vector<char>* chars = huffman->Decode(width, height, data, probability);
 
+			MTF* mtf = new MTF();
+			std::vector<char>* mtfDec = mtf->Decode(chars);
 
+			std::cout << "mtf: " << mtfDec->size() << std::endl;
 			//std::cout << "NOT YET IMPLEMENTED" << std::endl;
 		}
 			   break;

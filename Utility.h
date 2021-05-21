@@ -18,6 +18,8 @@
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 
 class Utility
@@ -41,5 +43,7 @@ public:
 	static void writeBmpFile(cv::Mat image);
 	static std::tuple<int, int, std::vector<bool>*, std::map<char, float>> readBinFile();
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
+
+	static void resizeImage(std::string fileName);
 };
 

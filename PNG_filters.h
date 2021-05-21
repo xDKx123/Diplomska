@@ -50,7 +50,7 @@ private:
 	short filterAverageDecode(short diff, short left, short up);
 	short filterPaethDecode(short diff, short left, short up, short leftup);
 public:
-
+	PNG_filters();
 	PNG_filters(std::string fileName);
 	~PNG_filters();
 

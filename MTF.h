@@ -8,7 +8,6 @@ private:
 
 public:
 	MTF();
-	MTF(std::vector<char>* v);
 	~MTF();
 	std::vector<char>* Encode(std::vector<char>* input);
 	std::vector<char>* Decode(std::vector<char>* input);

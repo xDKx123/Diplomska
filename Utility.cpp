@@ -102,6 +102,8 @@ int Utility::menu() {
 	std::cout << "1) Naloži dokument" << std::endl;
 	std::cout << "2) Poženi kodiranje" << std::endl;
 	std::cout << "3) Poženi dekodiranje" << std::endl;
+	std::cout << "4) Resize image" << std::endl;
+
 	std::cout << "\nTestiranje" << std::endl;
 	std::cout << "9) Testiranje file comparrison" << std::endl;
 	std::cout << "90) Testiranje filtrov PNG" << std::endl;
@@ -191,8 +193,12 @@ void Utility::writeBmpFile(cv::Mat image)
 {
 	std::string fileName = randomName() + validImageFileExtension;
 
-	std::cout << cv::imwrite(fileName, image) ? ("Ustvarjena datoteka: " + fileName) : ("Napaka pri zapisu datoteke");
-	std::cout << std::endl;
+	if (cv::imwrite(fileName, image)) {
+		std::cout << "Ustvarjena datoteka: " << fileName << std::endl;
+	}
+	else {
+		std::cout << "Napaka pri zapisu datoteke" << std::endl;
+	}
 }
 
 std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
@@ -210,8 +216,11 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 
 	std::map<char, float> probability;
 	int probabilitySize = binReader->readInt();
+	std::cout << "probabilitySize: " << probabilitySize << std::endl;
 	for (int x = 0; x < probabilitySize; x++) {
-		probability.insert(std::pair<char, float>(binReader->readByte(), binReader->readFloat()));
+		char c = binReader->readByte();
+		float f = binReader->readFloat();
+		probability.insert(std::pair<char, float>(c, f));
 	}
 
 	std::vector<bool>* data = new std::vector<bool>;
@@ -230,4 +239,12 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 	delete binReader;
 
 	return std::tuple<int, int, std::vector<bool>*, std::map<char, float>>(width, height, data, probability);
+}
+
+void Utility::resizeImage(std::string fileName)
+{
+	cv::Mat image(cv::imread(fileName));
+	cv::resize(image, image, cv::Size(), 0.1, 0.1);
+
+	cv::imwrite("Test.bmp", image);
 }

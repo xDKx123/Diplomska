@@ -1,6 +1,10 @@
 #include "PNG_filters.h"
 #include <iostream>
 
+PNG_filters::PNG_filters()
+{
+}
+
 PNG_filters::PNG_filters(std::string fileName) : image(cv::imread(fileName)) {}
 
 PNG_filters::~PNG_filters() {}
@@ -216,6 +220,9 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 		std::cerr << "Velikost ni pravilna" << std::endl;
 		image = NULL;
 		return image;
+	}
+	else {
+		std::cout << "Velikost je pravilna" << std::endl;
 	}
 
 	int index = 1;

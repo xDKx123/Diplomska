@@ -25,7 +25,6 @@ bool BinReader::readBit() {
 
 char BinReader::readByte() {
 	input.read((char*)&byte, 1);
-	byte = 0;
 	return byte;
 }
 
@@ -37,13 +36,11 @@ bool BinReader::isEof()
 int BinReader::readInt() {
 	int i;
 	input.read((char*)&i, 4);
-	byte = 0;
 	return i;
 }
 
 float BinReader::readFloat() {
 	float f;
 	input.read((char*)&f, 4);
-	byte = 0;
 	return f;
 }
