@@ -16,6 +16,30 @@ void PNG_filters::showImage() {
 	}
 }
 
+int PNG_filters::sumElementsInVector(std::vector<short>* v)
+{
+	return std::accumulate(v->begin(), v->end(), (int)0, [](int acc, const short val) {return acc + std::abs(val); });
+}
+
+/// <summary>
+/// Hevristika za raèunanje najbolj obtimalnega filtra
+/// </summary>
+/// <param name="sub"></param>
+/// <param name="up"></param>
+/// <param name="average"></param>
+/// <param name="paeth"></param>
+/// <returns></returns>
+int PNG_filters::hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth)
+{
+	std::vector<int> sums;
+	sums.push_back(sumElementsInVector(sub));
+	sums.push_back(sumElementsInVector(up));
+	sums.push_back(sumElementsInVector(average));
+	sums.push_back(sumElementsInVector(paeth));
+
+	return std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()));
+}
+
 /// <summary>
 /// Preverimo èe imamo vnešeno sliko
 /// </summary>
@@ -56,7 +80,7 @@ short PNG_filters::fPaeth(short left, short up, short leftUp) {
 }
 
 short PNG_filters::filterPeathEncode(short current, short left, short up, short leftUp){
-	return (current - fPaeth(left, up, leftUp)) % 256;
+	return (current - fPaeth(left, up, leftUp)) % MODULUS;
 }
 
 short PNG_filters::filterNoneDecode()
@@ -211,9 +235,31 @@ std::vector<char>* PNG_filters::Encode() {
 		}
 	}
 
-	vec->push_back(static_cast<char> (SelectedFilter::Average));
-	for (auto x : *encodedAvg) {
-		vec->push_back(static_cast<char> (x));
+	int smallest = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+
+	if (smallest == 0) {
+		vec->push_back(static_cast<char> (SelectedFilter::Sub));
+		for (auto x : *encodedSub) {
+			vec->push_back(static_cast<char> (x));
+		}
+	}
+	else if (smallest == 1) {
+		vec->push_back(static_cast<char> (SelectedFilter::Up));
+		for (auto x : *encodedUp) {
+			vec->push_back(static_cast<char> (x));
+		}
+	}
+	else if (smallest == 2) {
+		vec->push_back(static_cast<char> (SelectedFilter::Average));
+		for (auto x : *encodedAvg) {
+			vec->push_back(static_cast<char> (x));
+		}
+	}
+	else {
+		vec->push_back(static_cast<char> (SelectedFilter::Paeth));
+		for (auto x : *encodedPaeth) {
+			vec->push_back(static_cast<char> (x));
+		}
 	}
 
 	std::cout << "Vec size: " << vec->size() << std::endl;

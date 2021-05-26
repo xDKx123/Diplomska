@@ -4,6 +4,9 @@
 #include <string.h>
 #include <vector>
 #include <optional>
+#include <numeric>
+#include <cstdarg>
+#include <stdarg.h>
 
 #define MODULUS 256
 
@@ -36,6 +39,9 @@ private:
 
 	bool isImage();
 	void showImage();
+	int sumElementsInVector(std::vector<short>* v);
+	int hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth);
+
 	short filterNoneEncode();
 	short filterSubEncode(short  current, short  left);
 	short filterUpEncode(short  current, short  up);
