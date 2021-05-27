@@ -40,7 +40,8 @@ private:
 	bool isImage();
 	void showImage();
 	int sumElementsInVector(std::vector<short>* v);
-	int hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth);
+	std::vector<char>* createCompressedVector(SelectedFilter sf, std::vector<short>* v);
+	std::vector<char>* hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth);
 
 	short filterNoneEncode();
 	short filterSubEncode(short  current, short  left);

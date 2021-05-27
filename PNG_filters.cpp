@@ -21,6 +21,16 @@ int PNG_filters::sumElementsInVector(std::vector<short>* v)
 	return std::accumulate(v->begin(), v->end(), (int)0, [](int acc, const short val) {return acc + std::abs(val); });
 }
 
+std::vector<char>* PNG_filters::createCompressedVector(SelectedFilter sf, std::vector<short>* v)
+{
+	std::vector<char>* comp = new std::vector<char>;
+	comp->push_back(static_cast<char> (sf));
+	for (auto x : *v) {
+		comp->push_back(static_cast<char> (x));
+	}
+	return nullptr;
+}
+
 /// <summary>
 /// Hevristika za raèunanje najbolj obtimalnega filtra
 /// </summary>
@@ -29,7 +39,7 @@ int PNG_filters::sumElementsInVector(std::vector<short>* v)
 /// <param name="average"></param>
 /// <param name="paeth"></param>
 /// <returns></returns>
-int PNG_filters::hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth)
+std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth)
 {
 	std::vector<int> sums;
 	sums.push_back(sumElementsInVector(sub));
@@ -37,7 +47,20 @@ int PNG_filters::hevristics(std::vector<short>* sub, std::vector<short>* up, std
 	sums.push_back(sumElementsInVector(average));
 	sums.push_back(sumElementsInVector(paeth));
 
-	return std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()));
+	switch (std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()))) {
+		case 0: {
+			return createCompressedVector(SelectedFilter::Sub, sub);
+		}
+		case 1: {
+			return createCompressedVector(SelectedFilter::Up, up);
+		}
+		case 2: {
+			return createCompressedVector(SelectedFilter::Average, average);
+		}
+		case 3: {
+			return createCompressedVector(SelectedFilter::Paeth, paeth);
+		}
+	}
 }
 
 /// <summary>
@@ -118,7 +141,7 @@ std::vector<char>* PNG_filters::Encode() {
 	}
 
 	/*std::vector<Values*> *vec = new std::vector<Values*>;*/
-	std::vector<char>* vec = new std::vector<char>;
+	//std::vector<char>* vec = new std::vector<char>;
 
 	//cv::Size ms = image.size();
 	int height = image.size().height;
@@ -235,35 +258,35 @@ std::vector<char>* PNG_filters::Encode() {
 		}
 	}
 
-	int smallest = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+	return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 
-	if (smallest == 0) {
-		vec->push_back(static_cast<char> (SelectedFilter::Sub));
-		for (auto x : *encodedSub) {
-			vec->push_back(static_cast<char> (x));
-		}
-	}
-	else if (smallest == 1) {
-		vec->push_back(static_cast<char> (SelectedFilter::Up));
-		for (auto x : *encodedUp) {
-			vec->push_back(static_cast<char> (x));
-		}
-	}
-	else if (smallest == 2) {
-		vec->push_back(static_cast<char> (SelectedFilter::Average));
-		for (auto x : *encodedAvg) {
-			vec->push_back(static_cast<char> (x));
-		}
-	}
-	else {
-		vec->push_back(static_cast<char> (SelectedFilter::Paeth));
-		for (auto x : *encodedPaeth) {
-			vec->push_back(static_cast<char> (x));
-		}
-	}
+	//if (smallest == 0) {
+	//	vec->push_back(static_cast<char> (SelectedFilter::Sub));
+	//	for (auto x : *encodedSub) {
+	//		vec->push_back(static_cast<char> (x));
+	//	}
+	//}
+	//else if (smallest == 1) {
+	//	vec->push_back(static_cast<char> (SelectedFilter::Up));
+	//	for (auto x : *encodedUp) {
+	//		vec->push_back(static_cast<char> (x));
+	//	}
+	//}
+	//else if (smallest == 2) {
+	//	vec->push_back(static_cast<char> (SelectedFilter::Average));
+	//	for (auto x : *encodedAvg) {
+	//		vec->push_back(static_cast<char> (x));
+	//	}
+	//}
+	//else {
+	//	vec->push_back(static_cast<char> (SelectedFilter::Paeth));
+	//	for (auto x : *encodedPaeth) {
+	//		vec->push_back(static_cast<char> (x));
+	//	}
+	//}
 
-	std::cout << "Vec size: " << vec->size() << std::endl;
-	return vec;
+	//std::cout << "Vec size: " << vec->size() << std::endl;
+	//return vec;
 	//std::cout << "imagesize: " << image.size().height << std::endl;
 }
 
