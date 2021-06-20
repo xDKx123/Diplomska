@@ -28,7 +28,7 @@ std::vector<char>* PNG_filters::createCompressedVector(SelectedFilter sf, std::v
 	for (auto x : *v) {
 		comp->push_back(static_cast<char> (x));
 	}
-	return nullptr;
+	return comp;
 }
 
 /// <summary>
@@ -59,6 +59,9 @@ std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<
 		}
 		case 3: {
 			return createCompressedVector(SelectedFilter::Paeth, paeth);
+		}
+		default: {
+			return createCompressedVector(SelectedFilter::Sub, sub);
 		}
 	}
 }

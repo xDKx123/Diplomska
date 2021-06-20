@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include <Windows.h>
-#include <atlstr.h>
+//#include <Windows.h>
+//#include <atlstr.h>
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -11,7 +11,7 @@
 #include <fstream>
 #include <filesystem>
 #include <random>
-#include <uuids.h>
+//#include <uuids.h>
 
 #include "BinReader.h"
 #include "BinWriter.h"

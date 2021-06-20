@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string.h>
-#include <Windows.h>
-#include <atlstr.h>
+//#include <Windows.h>
+//#include <atlstr.h>
 #include <locale>
 #include <chrono>
 #include <list>
@@ -9,7 +9,6 @@
 #include "PNG_filters.h"
 #include "Utility.h"
 #include "MTF.h"
-#include "bwt.hpp"
 #include "Huffman.h"
 #include "Huffman.cpp"
 
@@ -23,10 +22,13 @@ int main(int argc, char* argv) {
 
 	//pngFilters->showImage();
 
+	std::string fileName = "Test.bmp";
+
 	while (running) {
 		switch (Utility::menu()) {
 		case 1: {
-			pngFilters = new PNG_filters(Utility::getImage());
+			//pngFilters = new PNG_filters(Utility::getImage());
+			pngFilters = new PNG_filters(fileName);
 		}
 			break;
 
@@ -152,6 +154,17 @@ int main(int argc, char* argv) {
 		case 91: {
 			//BWT
 			std::cout << "NOT YET IMPLEMENTED" << std::endl;
+
+			std::vector<char> testingBWT;
+			testingBWT.push_back('b');
+			testingBWT.push_back('c');
+			testingBWT.push_back('d');
+			testingBWT.push_back('1');
+			testingBWT.push_back('k');
+
+			//auto key = townsend::algorithm::bwtEncode(testingBWT.begin(), testingBWT.end());
+
+			
 		}
 			   break;
 

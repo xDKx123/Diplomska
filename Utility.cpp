@@ -6,22 +6,23 @@
 /// <returns></returns>
 std::string Utility::randomName()
 {
-	USES_CONVERSION;
-	GUID g;
-	HRESULT hCreateGuid = CoCreateGuid(&g);
+	//USES_CONVERSION;
+	//GUID g;
+	//HRESULT hCreateGuid = CoCreateGuid(&g);
 
-	OLECHAR* guidString;
-	StringFromCLSID(g, &guidString);
+	//OLECHAR* guidString;
+	//StringFromCLSID(g, &guidString);
 
-	std::string pString = OLE2CA(static_cast<LPCOLESTR>(guidString));
-	//guidStr = pString;
-	//guidStr = guidStr.replace(guidStr.begin(), guidStr.end(), '-', '_').substr(1, guidStr.size() - 1);
-	
-	std::replace(pString.begin(), pString.end(), '-', '_');
+	//std::string pString = OLE2CA(static_cast<LPCOLESTR>(guidString));
+	////guidStr = pString;
+	////guidStr = guidStr.replace(guidStr.begin(), guidStr.end(), '-', '_').substr(1, guidStr.size() - 1);
+	//
+	//std::replace(pString.begin(), pString.end(), '-', '_');
 
-	std::string t = pString.substr(1, pString.length() - 2);
+	//std::string t = pString.substr(1, pString.length() - 2);
 
-	return pString.substr(1, pString.length() - 2);
+	//return pString.substr(1, pString.length() - 2);
+	return "";
 }
 
 /// <summary>
@@ -29,38 +30,40 @@ std::string Utility::randomName()
 /// </summary>
 /// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
-	try {
+	//try {
 
-		OPENFILENAME ofn;
+	//	OPENFILENAME ofn;
 
-		char szFile[MAXUINT8];
+	//	char szFile[MAXUINT8];
 
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = NULL;
-		ofn.lpstrFile = (LPWSTR)szFile;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = sizeof(szFile);
-		//ofn.lpstrFilter = (LPWSTR)"All\0*.*\0Text\0*.TXT\0";
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	//	ZeroMemory(&ofn, sizeof(ofn));
+	//	ofn.lStructSize = sizeof(ofn);
+	//	ofn.hwndOwner = NULL;
+	//	ofn.lpstrFile = (LPWSTR)szFile;
+	//	ofn.lpstrFile[0] = '\0';
+	//	ofn.nMaxFile = sizeof(szFile);
+	//	//ofn.lpstrFilter = (LPWSTR)"All\0*.*\0Text\0*.TXT\0";
+	//	ofn.nFilterIndex = 1;
+	//	ofn.lpstrFileTitle = NULL;
+	//	ofn.nMaxFileTitle = 0;
+	//	ofn.lpstrInitialDir = NULL;
+	//	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-		if (GetOpenFileName(&ofn)) {
-			//std::cout << ofn.lpstrFile << std::endl;
-			return std::string(CW2A(ofn.lpstrFile));
-		}
-		else {
-			//std::cout << "Failed" << std::endl;
-			return "";
-		}
-	}
-	catch (const std::exception& ex) {
-		std::cout << ex.what() << std::endl;
-		return "";
-	}
+	//	if (GetOpenFileName(&ofn)) {
+	//		//std::cout << ofn.lpstrFile << std::endl;
+	//		return std::string(CW2A(ofn.lpstrFile));
+	//	}
+	//	else {
+	//		//std::cout << "Failed" << std::endl;
+	//		return "";
+	//	}
+	//}
+	//catch (const std::exception& ex) {
+	//	std::cout << ex.what() << std::endl;
+	//	return "";
+	//}
+
+	return "";
 }
 
 /// <summary>
@@ -183,7 +186,8 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 void Utility::writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
-	std::string fileName = randomName() + validEncryptedFileExtension;
+	//std::string fileName = randomName() + validEncryptedFileExtension;
+	std::string fileName = "out" + validEncryptedFileExtension;
 	BinWriter* binWriter = new BinWriter(fileName);
 
 	binWriter->writeInt(width);
@@ -217,7 +221,8 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 /// <param name="image">slika, ki jo želimo zapisati na disk</param>
 void Utility::writeBmpFile(cv::Mat image)
 {
-	std::string fileName = randomName() + validImageFileExtension;
+	//std::string fileName = randomName() + validImageFileExtension;
+	std::string fileName = "out" + validImageFileExtension;
 
 	if (cv::imwrite(fileName, image)) {
 		std::cout << "Ustvarjena datoteka: " << fileName << std::endl;
@@ -234,7 +239,8 @@ void Utility::writeBmpFile(cv::Mat image)
 std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
 {
 	//NE DIRAJ KER DELA
-	std::string fileName = getImage();
+	//std::string fileName = getImage();
+	std::string fileName = "out.bin";
 	BinReader* binReader = new BinReader(fileName);
 
 	for (int x = 0; x < 8; x++) {
