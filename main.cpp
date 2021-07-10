@@ -12,8 +12,10 @@
 #include "Huffman.h"
 #include "Huffman.cpp"
 
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
+#include "additional_library/bwt.hpp"
+
+#include <opencv4/opencv2/imgcodecs.hpp>
+#include <opencv4/opencv2/highgui.hpp>
 
 int main(int argc, char* argv) {
 	setlocale(LC_ALL, "slovenian");
@@ -22,7 +24,7 @@ int main(int argc, char* argv) {
 
 	//pngFilters->showImage();
 
-	std::string fileName = "Test.bmp";
+	std::string fileName = "testing.bmp";
 
 	while (running) {
 		switch (Utility::menu()) {
@@ -40,11 +42,18 @@ int main(int argc, char* argv) {
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+
+				start = std::chrono::system_clock::now();
+				auto key = townsend::algorithm::bwtEncode(v->begin(), v->end());
+				end = std::chrono::system_clock::now();
+				int index = std::distance(v->begin(), key);
+				std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
 				std::vector<char>* mtfTransformed = mtf->Encode(v);
 				end = std::chrono::system_clock::now();
-				std::cout << "Trajanje mtf: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				std::cout << "Trajanje MTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
 
@@ -55,10 +64,10 @@ int main(int argc, char* argv) {
 				std::map<char, float> probability;
 				std::tie(tree, probability) = hf->Encode(mtfTransformed);
 				end = std::chrono::system_clock::now();
-				std::cout << "Trajanje huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 				start = std::chrono::system_clock::now();
-				Utility::writeBinFile(size.width, size.height, mtfTransformed, tree, probability);
+				Utility::writeBinFile(size.width, size.height, index, mtfTransformed, tree, probability);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				v->clear();
@@ -70,24 +79,24 @@ int main(int argc, char* argv) {
 				delete hf;
 			}
 			else {
-				std::cout << "Najprej naložite sliko." << std::endl;
+				std::cout << "Najprej naloï¿½ite sliko." << std::endl;
 			}
 		}
 			break;
 
 
 		case 3: {
-			int width, height;
+			int width, height, index;
 			std::vector<bool>* data;
 			std::map<char, float> probability;
 
 			auto start = std::chrono::system_clock::now();
-			std::tie(width, height, data, probability) = Utility::readBinFile();
+			std::tie(width, height, index, data, probability) = Utility::readBinFile();
 			auto end = std::chrono::system_clock::now();
 			std::cout << "Trajanje branja binarne datoteke: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			std::cout << "data: " << data->size() << std::endl;
+			//std::cout << "data: " << data->size() << std::endl;
 
 			Huffman<float>* huffman = new Huffman<float>();
 
@@ -97,7 +106,7 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			std::cout << "data: " << chars->size() << std::endl;
+			//std::cout << "data: " << chars->size() << std::endl;
 
 			MTF* mtf = new MTF();
 			start = std::chrono::system_clock::now();
@@ -106,14 +115,20 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
+			auto key2 = std::next(mtfDecode->begin(), index);
+			start = std::chrono::system_clock::now();
+			townsend::algorithm::bwtDecode(mtfDecode->begin(), mtfDecode->end(), key2);
+			end = std::chrono::system_clock::now();
+			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+			//std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
 
 			PNG_filters* png = new PNG_filters();
 
 			start = std::chrono::system_clock::now();
 			cv::Mat image = png->Decode(width, height, mtfDecode);
 			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje png dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			std::cout << "Trajanje PNG dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 			Utility::writeBmpFile(image);
 
 		}
@@ -153,17 +168,99 @@ int main(int argc, char* argv) {
 
 		case 91: {
 			//BWT
-			std::cout << "NOT YET IMPLEMENTED" << std::endl;
+			std::cout << "TEST:" << std::endl;
 
 			std::vector<char> testingBWT;
-			testingBWT.push_back('b');
-			testingBWT.push_back('c');
-			testingBWT.push_back('d');
-			testingBWT.push_back('1');
-			testingBWT.push_back('k');
+			std::vector<char> check;
+			
+			for (int x = 0; x < 100; x++) {
+				for (int y = 0; y < 256;y++) {
+					char ca = rand() % 256;
+					testingBWT.push_back(static_cast<char>(ca));
+					check.push_back(static_cast<char>(ca));
+				}
+			}
 
-			//auto key = townsend::algorithm::bwtEncode(testingBWT.begin(), testingBWT.end());
+			std::cout << "Generated array" << std::endl;
 
+			auto key = townsend::algorithm::bwtEncode(testingBWT.begin(), testingBWT.end());
+
+			// for (int x = 0; x < 100; x++) {
+			// 	std::cout << testingBWT[x];
+			// }
+			// std::cout << std::endl;
+
+			int index = std::distance(testingBWT.begin(),key);
+
+			std::cout << "Encode" << std::endl;
+
+
+			BinWriter *bw = new BinWriter("testingBwt.bin");
+			bw->writeInt(index);
+			// std::cout << "index: " << testingBWT.size() << std::endl;
+			for (auto it : testingBWT) {
+				bw->writeByte(it);
+			// 	std::cout << it;
+			 }
+			// std::cout << std::endl;
+
+			// for (int x = 0; x < 7; x++) {
+			// 	bw->writeBit(false);
+			// }
+			// bw->writeBit(true);
+
+			delete bw;
+
+			std::vector<char> data;
+
+			BinReader *br = new BinReader("testingBwt.bin");
+			for (int x = 0; x < 8; x++) {
+				bool b = br->readBit();
+			}
+
+			index = br->readInt();
+
+			while (!br->isEof()) {
+				data.push_back(br->readByte());
+			}
+
+			data.pop_back();
+
+			for (int x = 0; x < 100; x++) {
+				std::cout << data[x];
+			}
+			std::cout << std::endl;
+			// while (data.back() != true) {
+			// 	data.pop_back();
+			// }
+
+			// for (int x = 0; x < 8; x++) {
+			// 	data.pop_back();
+			// }
+
+			delete br;
+
+			// std::cout << "index: " << data.size() << std::endl;
+			
+			auto key2 = std::next(data.begin(), index);
+
+			townsend::algorithm::bwtDecode(data.begin(), data.end(), key2);
+
+			std::cout << "Decode" << std::endl;
+
+			// for (auto it : testingBWT) {
+			// 	std::cout << it;
+			// }
+			// std::cout << std::endl;
+
+			// for (int x = 0; x < testingBWT.size(); x++) {
+			// 	if (data[x] != check[x]) {
+			// 		std::cout << "Test failed at index: " << x << std::endl;
+			// 		break;
+			// 	}
+			// }
+
+			std::cout << "Test passed" << std::endl;
 			
 		}
 			   break;
@@ -239,15 +336,15 @@ int main(int argc, char* argv) {
 
 			delete hff;
 
-			Utility::writeBinFile(0, 0, mtf1Dec, tree, probability);
+			Utility::writeBinFile(0, 0,0, mtf1Dec, tree, probability);
 
 			std::cout << "mtf: " << mtf1Dec->size() << std::endl;
 
-			int width, height;
+			int width, height, idx;
 			std::vector<bool>* data;
 			std::map<char, float> probability2;
 
-			std::tie(width, height, data, probability2) = Utility::readBinFile();
+			std::tie(width, height, idx, data, probability2) = Utility::readBinFile();
 
 			Huffman<float>* huffman = new Huffman<float>();
 			std::vector<char>* chars = huffman->Decode(data, probability);
@@ -264,7 +361,7 @@ int main(int argc, char* argv) {
 			break;
 
 		default:
-			std::cout << "Napaèna izbira." << std::endl;
+			std::cout << "Napaï¿½na izbira." << std::endl;
 			break;
 		}
 	}

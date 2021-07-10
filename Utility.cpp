@@ -1,7 +1,7 @@
 #include "Utility.h"
 
 /// <summary>
-/// Funkcija zgenerira nakljuèno ime
+/// Funkcija zgenerira nakljuï¿½no ime
 /// </summary>
 /// <returns></returns>
 std::string Utility::randomName()
@@ -69,7 +69,7 @@ std::string Utility::getImage() {
 /// <summary>
 /// Prikaz slike
 /// </summary>
-/// <param name="image">slika, ki jo želimo prikazati</param>
+/// <param name="image">slika, ki jo ï¿½elimo prikazati</param>
 void Utility::displayImage(cv::Mat image)
 {
 	cv::imshow("Test", image);
@@ -80,7 +80,7 @@ void Utility::displayImage(cv::Mat image)
 /// </summary>
 /// <param name="image1">slika ena</param>
 /// <param name="image2">slika dva</param>
-/// <returns>true èe sta sliki enaki, sicer false</returns>
+/// <returns>true ï¿½e sta sliki enaki, sicer false</returns>
 bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 	if (!image1.empty() and !image2.empty()) {
 		for (int x = 0; x < image1.size().height; x++) {
@@ -110,9 +110,9 @@ bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 /// <returns>int - izbira</returns>
 int Utility::menu() {
 	std::cout << "\n\nMeni" << std::endl;
-	std::cout << "1) Naloži dokument" << std::endl;
-	std::cout << "2) Poženi kodiranje" << std::endl;
-	std::cout << "3) Poženi dekodiranje" << std::endl;
+	std::cout << "1) Naloï¿½i dokument" << std::endl;
+	std::cout << "2) Poï¿½eni kodiranje" << std::endl;
+	std::cout << "3) Poï¿½eni dekodiranje" << std::endl;
 	std::cout << "4) Resize image" << std::endl;
 
 	std::cout << "\nTestiranje" << std::endl;
@@ -178,12 +178,12 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 /// <summary>
 /// Zapis podatkov v binarno datoteko
 /// </summary>
-/// <param name="width">širina slika</param>
-/// <param name="height">višina slike</param>
+/// <param name="width">ï¿½irina slika</param>
+/// <param name="height">viï¿½ina slike</param>
 /// <param name="items">slikovni podatki</param>
 /// <param name="encodedValues">binarni podatki posameznega znaka</param>
 /// <param name="probability">verjetnostna tabela</param>
-void Utility::writeBinFile(int width, int height, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
+void Utility::writeBinFile(int width, int height, int index, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
 	//std::string fileName = randomName() + validEncryptedFileExtension;
@@ -192,6 +192,8 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 
 	binWriter->writeInt(width);
 	binWriter->writeInt(height);
+
+	binWriter->writeInt(index);
 
 	binWriter->writeInt(probability.size());
 	for (auto pair : probability) {
@@ -218,7 +220,7 @@ void Utility::writeBinFile(int width, int height, std::vector<char>* items, std:
 /// <summary>
 /// Ustvari bmp sliko
 /// </summary>
-/// <param name="image">slika, ki jo želimo zapisati na disk</param>
+/// <param name="image">slika, ki jo ï¿½elimo zapisati na disk</param>
 void Utility::writeBmpFile(cv::Mat image)
 {
 	//std::string fileName = randomName() + validImageFileExtension;
@@ -235,8 +237,8 @@ void Utility::writeBmpFile(cv::Mat image)
 /// <summary>
 /// Branje binarne datoteke
 /// </summary>
-/// <returns>širina, višina, verjetnostna tabela, slikovni podatki</returns>
-std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
+/// <returns>ï¿½irina, viï¿½ina, verjetnostna tabela, slikovni podatki</returns>
+std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
 {
 	//NE DIRAJ KER DELA
 	//std::string fileName = getImage();
@@ -249,6 +251,8 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 
 	int width = binReader->readInt();
 	int height = binReader->readInt();
+
+	int index = binReader->readInt();
 
 	std::map<char, float> probability;
 	int probabilitySize = binReader->readInt();
@@ -274,7 +278,7 @@ std::tuple<int, int, std::vector<bool>*, std::map<char, float>> Utility::readBin
 
 	delete binReader;
 
-	return std::tuple<int, int, std::vector<bool>*, std::map<char, float>>(width, height, data, probability);
+	return std::tuple<int, int, int, std::vector<bool>*, std::map<char, float>>(width, height, index, data, probability);
 }
 
 /// <summary>
