@@ -63,7 +63,7 @@ std::string Utility::getImage() {
 	//	return "";
 	//}
 
-	return "";
+	return "testing.bmp";
 }
 
 /// <summary>
@@ -113,7 +113,7 @@ int Utility::menu() {
 	std::cout << "1) Nalo�i dokument" << std::endl;
 	std::cout << "2) Po�eni kodiranje" << std::endl;
 	std::cout << "3) Po�eni dekodiranje" << std::endl;
-	std::cout << "4) Resize image" << std::endl;
+	//std::cout << "4) Resize image" << std::endl;
 
 	std::cout << "\nTestiranje" << std::endl;
 	std::cout << "9) Testiranje file comparrison" << std::endl;
