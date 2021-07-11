@@ -32,7 +32,7 @@ std::vector<char>* PNG_filters::createCompressedVector(SelectedFilter sf, std::v
 }
 
 /// <summary>
-/// Hevristika za raèunanje najbolj obtimalnega filtra
+/// Hevristika za raï¿½unanje najbolj obtimalnega filtra
 /// </summary>
 /// <param name="sub"></param>
 /// <param name="up"></param>
@@ -49,15 +49,19 @@ std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<
 
 	switch (std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()))) {
 		case 0: {
+			std::cout << "Filter SUB" << std::endl;
 			return createCompressedVector(SelectedFilter::Sub, sub);
 		}
 		case 1: {
+			std::cout << "Filter UP" << std::endl;
 			return createCompressedVector(SelectedFilter::Up, up);
 		}
 		case 2: {
+			std::cout << "Filter AVERAGE" << std::endl;
 			return createCompressedVector(SelectedFilter::Average, average);
 		}
 		case 3: {
+			std::cout << "Filter PEATH" << std::endl;
 			return createCompressedVector(SelectedFilter::Paeth, paeth);
 		}
 		default: {
@@ -67,7 +71,7 @@ std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<
 }
 
 /// <summary>
-/// Preverimo èe imamo vnešeno sliko
+/// Preverimo ï¿½e imamo vneï¿½eno sliko
 /// </summary>
 /// <returns></returns>
 bool PNG_filters::isImage() {
@@ -161,7 +165,7 @@ std::vector<char>* PNG_filters::Encode() {
 
 
 
-	//èez celotno sliko uporabi filter in vrstice ter primerjaj rezultate.
+	//ï¿½ez celotno sliko uporabi filter in vrstice ter primerjaj rezultate.
 
 
 
@@ -296,13 +300,13 @@ std::vector<char>* PNG_filters::Encode() {
 /// <summary>
 /// Dekodiramo sliko z izbranim filtrom
 /// </summary>
-/// <param name="width">širina slike</param>
-/// <param name="height">višina slike</param>
+/// <param name="width">ï¿½irina slike</param>
+/// <param name="height">viï¿½ina slike</param>
 /// <param name="values">slikovni podatki</param>
 /// <returns></returns>
 cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 {
-	//Preverimo èe je kolièina podatkov za zapis v sliko ustrezna
+	//Preverimo ï¿½e je koliï¿½ina podatkov za zapis v sliko ustrezna
 	if (values->size() - 1 != width * height * 3) {
 		std::cerr << "Velikost ni pravilna" << std::endl;
 		image = NULL;
@@ -315,9 +319,9 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 	int index = 1;
 	int encoded = static_cast<int>(values->at(0));
 
-	//Preverimo, èe je pravilno nastavljen tip filtriranja slike.
+	//Preverimo, ï¿½e je pravilno nastavljen tip filtriranja slike.
 	if (encoded < 1 or encoded > 4) {
-		std::cerr << "Tip kodiranja ni doloèen pravilno" << std::endl;
+		std::cerr << "Tip kodiranja ni doloï¿½en pravilno" << std::endl;
 		image = NULL;
 		return image;
 	}

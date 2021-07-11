@@ -8,7 +8,7 @@
 /// <summary>
 /// Za vsak znak dobimo njegov binarni zapis
 /// </summary>
-/// <typeparam name="T">float - verjetnostna tabela, int - število pojavitev</typeparam>
+/// <typeparam name="T">float - verjetnostna tabela, int - ï¿½tevilo pojavitev</typeparam>
 /// <param name="v">znaki z njihovimi podatki</param>
 /// <param name="root">koren</param>
 /// <param name="b">binarni vektor</param>
@@ -49,8 +49,8 @@ void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* ro
 /// <summary>
 /// Zgradimo Huffmanovo dravo
 /// </summary>
-/// <typeparam name="T">float - verjetnostna tabela, int - število pojavitev</typeparam>
-/// <param name="v">verjetnostna tabela / tabela, ki šteje pojavitve</param>
+/// <typeparam name="T">float - verjetnostna tabela, int - ï¿½tevilo pojavitev</typeparam>
+/// <param name="v">verjetnostna tabela / tabela, ki ï¿½teje pojavitve</param>
 /// <returns></returns>
 template<class T>
 std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
@@ -89,7 +89,7 @@ std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
 }
 
 /// <summary>
-/// Za vsak znak zraèuna verjetnost pojavitve
+/// Za vsak znak zraï¿½una verjetnost pojavitve
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <param name="mp">pojavitvena tabela</param>
@@ -135,6 +135,12 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 		//std::map<char, int>::iterator it = std::find(mp.begin(), mp.end(), c);
 		mp[c]++;
 	}
+
+	// std::cout << "--------------DEBUG INFO--------------" << std::endl;
+	// for (auto it : mp)  {
+	// 	std::cout << static_cast<int>(it.first) << "\t" << it.second << std::endl; 
+	// }
+	// std::cout << "--------------DEBUG INFO--------------" << std::endl;
 
 
 	//mp.erase(std::remove_if(mp.begin(), mp.end(), [](std::pair<char, int> p) { return p.second != 0; }), mp.end());

@@ -30,6 +30,7 @@ int main(int argc, char* argv) {
 		switch (Utility::menu()) {
 		case 1: {
 			//pngFilters = new PNG_filters(Utility::getImage());
+			fileName = Utility::getImage();
 			pngFilters = new PNG_filters(fileName);
 		}
 			break;
@@ -66,13 +67,23 @@ int main(int argc, char* argv) {
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+
+				// std::cout << "--------------DEBUG INFO--------------" << std::endl;
+				// for (auto it : probability)  {
+				// 	std::cout << it.first << "\t" << it.second << std::endl; 
+				// }
+				// std::cout << "--------------DEBUG INFO--------------" << std::endl;
+
+
 				start = std::chrono::system_clock::now();
 				Utility::writeBinFile(size.width, size.height, index, mtfTransformed, tree, probability);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				v->clear();
 
-				std::cout << size.width << " " << size.height <<" " << mtfTransformed->size() << std::endl;
+
+				std::cout << "\nFile compression: " << Utility::compressionFactor(fileName, "out.bin") << std::endl;
+				
 
 				delete v;
 				delete mtf;
@@ -134,12 +145,12 @@ int main(int argc, char* argv) {
 		}
 			  break;
 
-		case 4: {
-			std::string file = Utility::getImage();
+		// case 4: {
+		// 	std::string file = Utility::getImage();
 
-			Utility::resizeImage(file);
-		}
-			  break;
+		// 	Utility::resizeImage(file);
+		// }
+		// 	  break;
 
 		case 9: {
 			std::string file1 = Utility::getImage();
