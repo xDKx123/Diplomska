@@ -10,3 +10,5 @@ Za delovanje potrebno:
 - opencv4
 
 Za pogon programa se požene skripta run.sh
+
+BWT algoritem pridobljen iz: https://github.com/kevintownsend/bwt
