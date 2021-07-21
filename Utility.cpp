@@ -195,11 +195,19 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 
 	binWriter->writeInt(index);
 
-	binWriter->writeInt(probability.size());
-	for (auto pair : probability) {
-		binWriter->writeByte(pair.first);
-		binWriter->writeFloat(pair.second);
+	//binWriter->writeInt(probability.size());
+	for (int x = 0; x < 256; x++) {
+		if (probability.find(static_cast<char>(x)) != probability.end()) {
+			binWriter->writeFloat(probability[static_cast<char>(x)]);
+		}
+		else {
+			binWriter->writeFloat(0.0f);
+		}
 	}
+	//for (auto pair : probability) {
+	//	//binWriter->writeByte(pair.first);
+	//	binWriter->writeFloat(probability[pair]);
+	//}
 
 	for (auto item : *items) {
 		for (auto v : encodedValues[item]) {
@@ -255,12 +263,14 @@ std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::rea
 	int index = binReader->readInt();
 
 	std::map<char, float> probability;
-	int probabilitySize = binReader->readInt();
-	std::cout << "probabilitySize: " << probabilitySize << std::endl;
-	for (int x = 0; x < probabilitySize; x++) {
-		char c = binReader->readByte();
+	//int probabilitySize = binReader->readInt();
+	//std::cout << "probabilitySize: " << probabilitySize << std::endl;
+	for (int x = 0; x < 256; x++) {
+		//char c = binReader->readByte();
 		float f = binReader->readFloat();
-		probability.insert(std::pair<char, float>(c,f));
+		if (f != 0.0f) {
+			probability.insert(std::pair<char, float>(static_cast<char>(x),f));
+		}
 	}
 
 	std::vector<bool>* data = new std::vector<bool>;

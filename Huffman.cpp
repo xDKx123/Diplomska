@@ -53,7 +53,7 @@ void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* ro
 /// <param name="v">verjetnostna tabela / tabela, ki �teje pojavitve</param>
 /// <returns></returns>
 template<class T>
-std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
+std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, float> v)
 {
 	std::map<char, std::vector<bool>> mp;
 
@@ -96,13 +96,18 @@ std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, T> v)
 /// <param name="tree">zgrajeno drevo</param>
 /// <returns></returns>
 template<class T>
-std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, std::map<char, std::vector<bool>> tree)
+std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, int size)
 {
 	std::map<char, float> cf;
 
-	for (auto p : tree) {
-		cf.insert(std::pair<char, float>(p.first, static_cast<float>(mp[p.first]) / tree.size()));
+	for (auto p : mp) {
+		if (p.second != 0) {
+			cf.insert(std::pair<char, float>(p.first, static_cast<float>(static_cast<double>(p.second) / size)));
+		}
 	}
+	//for (auto p : tree) {
+	//	cf.insert(std::pair<char, float>(p.first, static_cast<float>(mp[p.first]) / tree.size()));
+	//}
 
 	return cf;
 }
@@ -147,9 +152,19 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 
 	//std::vector<std::pair<char, int>> vec = sortedVectorOfValues(mp);
 
-	std::map<char, std::vector<bool>> tree = buildTree(mp);
+	std::map<char, float> cf = calculateProbability(mp, v->size());
 
-	std::map<char, float> cf = calculateProbability(mp, tree);
+	std::map<char, std::vector<bool>> tree = buildTree(cf);
+
+	for (auto node : tree) {
+		std::cout << static_cast<int>(node.first) << "\t";
+		for (auto b : node.second) {
+			std::cout << b;
+		}
+		std::cout <<std::endl;
+	}
+
+	//std::map<char, float> cf = calculateProbability(mp, v->size());
 
 	return std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>>(tree, cf);
 }
@@ -166,6 +181,14 @@ std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, fl
 	std::vector<char>* c = new std::vector<char>;
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
+
+	for (auto node : tree) {
+		std::cout << static_cast<int>(node.first) << "\t";
+		for (auto b : node.second) {
+			std::cout << b;
+		}
+		std::cout << std::endl;
+	}
 
 	std::vector<bool> bols;
 	for (auto b : *data) {
