@@ -313,7 +313,7 @@ std::vector<char>* PNG_filters::Encode() {
 cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 {
 	//Preverimo �e je koli�ina podatkov za zapis v sliko ustrezna
-	if (values->size() - 1 != width * height * 3) {
+	if (values->size() != width * height * 3) {
 		std::cerr << "Velikost ni pravilna" << std::endl;
 		image = NULL;
 		return image;

@@ -63,7 +63,7 @@ std::string Utility::getImage() {
 	//	return "";
 	//}
 
-	return "images/cartton2.bmp";
+	return "images/random1.bmp";
 }
 
 /// <summary>

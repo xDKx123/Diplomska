@@ -156,13 +156,13 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
-	for (auto node : tree) {
-		std::cout << static_cast<int>(node.first) << "\t";
-		for (auto b : node.second) {
-			std::cout << b;
-		}
-		std::cout <<std::endl;
-	}
+	// for (auto node : tree) {
+	// 	std::cout << static_cast<int>(node.first) << "\t";
+	// 	for (auto b : node.second) {
+	// 		std::cout << b;
+	// 	}
+	// 	std::cout <<std::endl;
+	// }
 
 	//std::map<char, float> cf = calculateProbability(mp, v->size());
 
@@ -182,13 +182,13 @@ std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, fl
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
-	for (auto node : tree) {
-		std::cout << static_cast<int>(node.first) << "\t";
-		for (auto b : node.second) {
-			std::cout << b;
-		}
-		std::cout << std::endl;
-	}
+	// for (auto node : tree) {
+	// 	std::cout << static_cast<int>(node.first) << "\t";
+	// 	for (auto b : node.second) {
+	// 		std::cout << b;
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 
 	std::vector<bool> bols;
 	for (auto b : *data) {
