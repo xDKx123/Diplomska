@@ -18,5 +18,6 @@ public:
 	char readByte();
 	int readInt();
 	float readFloat();
+	short readShort();
 };
 

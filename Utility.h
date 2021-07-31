@@ -16,6 +16,7 @@
 #include "BinReader.h"
 #include "BinWriter.h"
 #include "PNG_filters.h"
+#include "SelectedFilter.h"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>

@@ -44,3 +44,9 @@ float BinReader::readFloat() {
 	input.read((char*)&f, 4);
 	return f;
 }
+
+short BinReader::readShort() {
+	short s;
+	input.read((char*)&s, 2);
+	return s;
+}

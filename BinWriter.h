@@ -19,5 +19,6 @@ public:
 	void writeByte(char c);
 	void writeInt(int i);
 	void writeFloat(float f);
+	void writeShort(short s);
 };
 

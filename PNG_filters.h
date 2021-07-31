@@ -1,6 +1,4 @@
 #pragma once
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
 #include <string.h>
 #include <vector>
 #include <optional>
@@ -8,15 +6,16 @@
 #include <cstdarg>
 #include <stdarg.h>
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
+#include "SelectedFilter.h"
+
 #define MODULUS 256
 
 class PNG_filters
 {
 private:
-	enum class SelectedFilter
-	{
-		None, Sub, Up, Average, Paeth
-	};
 
 	struct Values {
 		SelectedFilter sf;
@@ -40,7 +39,7 @@ private:
 	bool isImage();
 	void showImage();
 	int sumElementsInVector(std::vector<short>* v);
-	std::vector<char>* createCompressedVector(SelectedFilter sf, std::vector<short>* v);
+	std::vector<char>* createCompressedVector(std::vector<short>* v);
 	std::vector<char>* hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth);
 
 	short filterNoneEncode();

@@ -21,10 +21,10 @@ int PNG_filters::sumElementsInVector(std::vector<short>* v)
 	return std::accumulate(v->begin(), v->end(), (int)0, [](int acc, const short val) {return acc + std::abs(val); });
 }
 
-std::vector<char>* PNG_filters::createCompressedVector(SelectedFilter sf, std::vector<short>* v)
+std::vector<char>* PNG_filters::createCompressedVector(std::vector<short>* v)
 {
 	std::vector<char>* comp = new std::vector<char>;
-	comp->push_back(static_cast<char> (sf));
+	//comp->push_back(static_cast<char> (sf));
 	for (auto x : *v) {
 		comp->push_back(static_cast<char> (x));
 	}
@@ -50,22 +50,28 @@ std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<
 	switch (std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()))) {
 		case 0: {
 			std::cout << "Filter SUB" << std::endl;
-			return createCompressedVector(SelectedFilter::Sub, sub);
+			currentSelectedFilter = SelectedFilter::Sub;
+			return createCompressedVector(sub);
 		}
 		case 1: {
 			std::cout << "Filter UP" << std::endl;
-			return createCompressedVector(SelectedFilter::Up, up);
+			currentSelectedFilter = SelectedFilter::Up;
+			return createCompressedVector(up);
 		}
 		case 2: {
 			std::cout << "Filter AVERAGE" << std::endl;
-			return createCompressedVector(SelectedFilter::Average, average);
+			currentSelectedFilter = SelectedFilter::Average;
+			return createCompressedVector(average);
 		}
 		case 3: {
 			std::cout << "Filter PEATH" << std::endl;
-			return createCompressedVector(SelectedFilter::Paeth, paeth);
+			currentSelectedFilter = SelectedFilter::Paeth;
+			return createCompressedVector(paeth);
 		}
 		default: {
-			return createCompressedVector(SelectedFilter::Sub, sub);
+			std::cout << "Filter default" << std::endl;
+			currentSelectedFilter = SelectedFilter::Sub;
+			return createCompressedVector(sub);
 		}
 	}
 }
@@ -316,15 +322,15 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 		std::cout << "Velikost je pravilna" << std::endl;
 	}
 
-	int index = 1;
-	int encoded = static_cast<int>(values->at(0));
+	int index = 0;
+	//int encoded = static_cast<int>(values->at(0));
 
 	//Preverimo, �e je pravilno nastavljen tip filtriranja slike.
-	if (encoded < 1 or encoded > 4) {
-		std::cerr << "Tip kodiranja ni dolo�en pravilno" << std::endl;
-		image = NULL;
-		return image;
-	}
+	// if (encoded < 1 or encoded > 4) {
+	// 	std::cerr << "Tip kodiranja ni dolo�en pravilno" << std::endl;
+	// 	image = NULL;
+	// 	return image;
+	// }
 
 	//image = cv::Mat(width, height, CV_8UC3);
 	image = cv::Mat(cv::Size(width, height), CV_8UC3);
@@ -343,16 +349,17 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 			leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
 
 			for (int z = 0; z < 3; z++, index++) {
-				if (encoded == static_cast<int>(SelectedFilter::Sub)) {
+				//if (encoded == static_cast<int>(SelectedFilter::Sub)) {
+				if (currentSelectedFilter == Sub) {
 					current[z] = left != nullCheck ? filterSubDecode(values->at(index), left[z]) : values->at(index);
 				}
-				else if (encoded == static_cast<int>(SelectedFilter::Up)) {
+				else if (currentSelectedFilter == Up) {
 					current[z] = up != nullCheck ? filterUpDecode(values->at(index), up[z]) : values->at(index);
 				}
-				else if (encoded == static_cast<int>(SelectedFilter::Average)) {
+				else if (currentSelectedFilter == Average) {
 					current[z] =left != nullCheck && up != nullCheck ? filterAverageDecode(values->at(index), left[z], up[z]) : values->at(index);
 				}
-				else if (encoded == static_cast<int>(SelectedFilter::Paeth))
+				else if (currentSelectedFilter == Paeth)
 				{
 					current[z] = left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPaethDecode(values->at(index), left[z], up[z], leftUp[z]) : values->at(index);
 				}

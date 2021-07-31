@@ -49,3 +49,8 @@ void BinWriter::writeFloat(float f)
 {
 	input.write((char*)&f, 4);
 }
+
+void BinWriter::writeShort(short s)
+{
+	input.write((char*)&s, 2);
+}

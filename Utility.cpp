@@ -63,7 +63,7 @@ std::string Utility::getImage() {
 	//	return "";
 	//}
 
-	return "testing.bmp";
+	return "images/cartton2.bmp";
 }
 
 /// <summary>
@@ -190,8 +190,8 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 	std::string fileName = "out" + validEncryptedFileExtension;
 	BinWriter* binWriter = new BinWriter(fileName);
 
-	binWriter->writeInt(width);
-	binWriter->writeInt(height);
+	binWriter->writeShort(width);
+	binWriter->writeShort(height);
 
 	binWriter->writeInt(index);
 
@@ -204,6 +204,29 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 			binWriter->writeFloat(0.0f);
 		}
 	}
+
+	std::vector<char> selFilter;
+	if (currentSelectedFilter == Sub) {
+		selFilter.push_back(false);
+		selFilter.push_back(false);
+	}
+	else if (currentSelectedFilter == Up) {
+		selFilter.push_back(false);
+		selFilter.push_back(true);
+	}
+	else if (currentSelectedFilter == Average) {
+		selFilter.push_back(true);
+		selFilter.push_back(false);
+	}
+	else if (currentSelectedFilter == Paeth) {
+		selFilter.push_back(true);
+		selFilter.push_back(true);
+	}
+
+	for (auto c : selFilter) {
+		binWriter->writeBit(c);
+	}
+
 	//for (auto pair : probability) {
 	//	//binWriter->writeByte(pair.first);
 	//	binWriter->writeFloat(probability[pair]);
@@ -257,8 +280,8 @@ std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::rea
 		binReader->readBit();
 	}
 
-	int width = binReader->readInt();
-	int height = binReader->readInt();
+	int width = binReader->readShort();
+	int height = binReader->readShort();
 
 	int index = binReader->readInt();
 
@@ -271,6 +294,22 @@ std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::rea
 		if (f != 0.0f) {
 			probability.insert(std::pair<char, float>(static_cast<char>(x),f));
 		}
+	}
+
+	bool b1 = binReader->readBit();
+	bool b2 = binReader->readBit();
+
+	if (b1 == false && b2 == false) {
+		currentSelectedFilter = Sub;
+	}
+	else if (b1 == false && b2 == true) {
+		currentSelectedFilter = Up;
+	}
+	else if (b1 == true && b2 == false) {
+		currentSelectedFilter = Average;
+	}
+	else if (b1 == true && b2 == true) {
+		currentSelectedFilter = Paeth;
 	}
 
 	std::vector<bool>* data = new std::vector<bool>;
