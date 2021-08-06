@@ -1,10 +1,6 @@
 #include "Huffman.h"
 #include "Utility.h"
 
-
-//template class Huffman<int>;
-//template class Huffman<float>;
-
 /// <summary>
 /// Za vsak znak dobimo njegov binarni zapis
 /// </summary>
@@ -32,19 +28,6 @@ void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* ro
 	makeCodes(v, root->left, b0);
 	makeCodes(v, root->right, b1);
 }
-
-//std::vector<std::pair<char, int>> Huffman::sortedVectorOfValues(std::map<char, int> mp) {
-//	std::vector<std::pair<char, int>> vec;
-//	for (std::map<char, int>::iterator it = mp.begin(); it != mp.end(); ++it) {
-//		if (it->second != 0) {
-//			vec.push_back(std::pair<char, int>(it->first, it->second));
-//		}
-//	}
-//
-//	std::sort(vec.begin(), vec.end(), [](const std::pair<char, int>& a, const std::pair<char, int>& b) {return a.second < b.second; });
-//
-//	return vec;
-//}
 
 /// <summary>
 /// Zgradimo Huffmanovo dravo
@@ -121,18 +104,7 @@ std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, i
 template<class T>
 std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>::Encode(std::vector<char>* v)
 {
-	//class T::value_type s;
-	//std::cout << s << std::endl;
-	
-
 	std::vector<bool>* b = new std::vector<bool>;
-
-	
-	//std::cout << typeid(v).name() << std::endl;
-
-	//if (typeid(v) == typeid(std::vector<char>*)) {
-
-	//}
 
 	std::map<char, int> mp = Utility::commonDictionaryMap();
 
@@ -141,30 +113,9 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 		mp[c]++;
 	}
 
-	// std::cout << "--------------DEBUG INFO--------------" << std::endl;
-	// for (auto it : mp)  {
-	// 	std::cout << static_cast<int>(it.first) << "\t" << it.second << std::endl; 
-	// }
-	// std::cout << "--------------DEBUG INFO--------------" << std::endl;
-
-
-	//mp.erase(std::remove_if(mp.begin(), mp.end(), [](std::pair<char, int> p) { return p.second != 0; }), mp.end());
-
-	//std::vector<std::pair<char, int>> vec = sortedVectorOfValues(mp);
-
 	std::map<char, float> cf = calculateProbability(mp, v->size());
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
-
-	// for (auto node : tree) {
-	// 	std::cout << static_cast<int>(node.first) << "\t";
-	// 	for (auto b : node.second) {
-	// 		std::cout << b;
-	// 	}
-	// 	std::cout <<std::endl;
-	// }
-
-	//std::map<char, float> cf = calculateProbability(mp, v->size());
 
 	return std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>>(tree, cf);
 }
@@ -182,14 +133,6 @@ std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, fl
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
-	// for (auto node : tree) {
-	// 	std::cout << static_cast<int>(node.first) << "\t";
-	// 	for (auto b : node.second) {
-	// 		std::cout << b;
-	// 	}
-	// 	std::cout << std::endl;
-	// }
-
 	std::vector<bool> bols;
 	for (auto b : *data) {
 		bols.push_back(b);
@@ -206,8 +149,3 @@ std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, fl
 
 	return c;
 }
-
-//void TemopraryFunction() {
-//	Huffman<int>hf1;
-//	Huffman<float>hf2;
-//}

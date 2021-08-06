@@ -1,69 +1,11 @@
 #include "Utility.h"
 
 /// <summary>
-/// Funkcija zgenerira naklju�no ime
-/// </summary>
-/// <returns></returns>
-std::string Utility::randomName()
-{
-	//USES_CONVERSION;
-	//GUID g;
-	//HRESULT hCreateGuid = CoCreateGuid(&g);
-
-	//OLECHAR* guidString;
-	//StringFromCLSID(g, &guidString);
-
-	//std::string pString = OLE2CA(static_cast<LPCOLESTR>(guidString));
-	////guidStr = pString;
-	////guidStr = guidStr.replace(guidStr.begin(), guidStr.end(), '-', '_').substr(1, guidStr.size() - 1);
-	//
-	//std::replace(pString.begin(), pString.end(), '-', '_');
-
-	//std::string t = pString.substr(1, pString.length() - 2);
-
-	//return pString.substr(1, pString.length() - 2);
-	return "";
-}
-
-/// <summary>
 /// Popup v katerem izberemo sliko
 /// </summary>
 /// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
-	//try {
-
-	//	OPENFILENAME ofn;
-
-	//	char szFile[MAXUINT8];
-
-	//	ZeroMemory(&ofn, sizeof(ofn));
-	//	ofn.lStructSize = sizeof(ofn);
-	//	ofn.hwndOwner = NULL;
-	//	ofn.lpstrFile = (LPWSTR)szFile;
-	//	ofn.lpstrFile[0] = '\0';
-	//	ofn.nMaxFile = sizeof(szFile);
-	//	//ofn.lpstrFilter = (LPWSTR)"All\0*.*\0Text\0*.TXT\0";
-	//	ofn.nFilterIndex = 1;
-	//	ofn.lpstrFileTitle = NULL;
-	//	ofn.nMaxFileTitle = 0;
-	//	ofn.lpstrInitialDir = NULL;
-	//	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-	//	if (GetOpenFileName(&ofn)) {
-	//		//std::cout << ofn.lpstrFile << std::endl;
-	//		return std::string(CW2A(ofn.lpstrFile));
-	//	}
-	//	else {
-	//		//std::cout << "Failed" << std::endl;
-	//		return "";
-	//	}
-	//}
-	//catch (const std::exception& ex) {
-	//	std::cout << ex.what() << std::endl;
-	//	return "";
-	//}
-
-	return "images/random1.bmp";
+		return "images/random1.bmp";
 }
 
 /// <summary>
@@ -96,12 +38,8 @@ bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 			}
 		}
 		return true;
-		//return image1.data == image2.data;
 	}
-	else {
-
-		return false;
-	}
+	return false;
 }
 
 /// <summary>
@@ -109,18 +47,18 @@ bool Utility::compareImages(cv::Mat image1, cv::Mat image2) {
 /// </summary>
 /// <returns>int - izbira</returns>
 int Utility::menu() {
-	std::cout << "\n\nMeni" << std::endl;
-	std::cout << "1) Nalo�i dokument" << std::endl;
-	std::cout << "2) Po�eni kodiranje" << std::endl;
-	std::cout << "3) Po�eni dekodiranje" << std::endl;
+	std::cout << "\n\n----------Meni----------\n" << std::endl;
+	std::cout << "1) Naloži dokument" << std::endl;
+	std::cout << "2) Poženi kodiranje" << std::endl;
+	std::cout << "3) Poženi dekodiranje" << std::endl;
 	//std::cout << "4) Resize image" << std::endl;
 
-	std::cout << "\nTestiranje" << std::endl;
-	std::cout << "9) Testiranje file comparrison" << std::endl;
-	std::cout << "90) Testiranje filtrov PNG" << std::endl;
-	std::cout << "91) Testiranje transformacije BWT" << std::endl;
-	std::cout << "92) Testiranje transformacije MTF" << std::endl;
-	std::cout << "93) Testiranje algoritma Huffman" << std::endl;
+	// std::cout << "\nTestiranje" << std::endl;
+	// std::cout << "9) Testiranje file comparrison" << std::endl;
+	// std::cout << "90) Testiranje filtrov PNG" << std::endl;
+	// std::cout << "91) Testiranje transformacije BWT" << std::endl;
+	// std::cout << "92) Testiranje transformacije MTF" << std::endl;
+	// std::cout << "93) Testiranje algoritma Huffman" << std::endl;
 
 	std::cout << "\n0) Zapri" << std::endl;
 
@@ -186,7 +124,6 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 void Utility::writeBinFile(int width, int height, int index, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
-	//std::string fileName = randomName() + validEncryptedFileExtension;
 	std::string fileName = "out" + validEncryptedFileExtension;
 	BinWriter* binWriter = new BinWriter(fileName);
 
@@ -195,7 +132,6 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 
 	binWriter->writeInt(index);
 
-	//binWriter->writeInt(probability.size());
 	for (int x = 0; x < 256; x++) {
 		if (probability.find(static_cast<char>(x)) != probability.end()) {
 			binWriter->writeFloat(probability[static_cast<char>(x)]);
@@ -204,6 +140,8 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 			binWriter->writeFloat(0.0f);
 		}
 	}
+
+	selectedNumberOfRowsData();
 
 	std::vector<char> selFilter;
 	if (currentSelectedFilter == Sub) {
@@ -340,4 +278,114 @@ void Utility::resizeImage(std::string fileName)
 	cv::resize(image, image, cv::Size(), 0.1, 0.1);
 
 	cv::imwrite("Test.bmp", image);
+}
+
+std::vector<bool> Utility::writeSelectedNumberOfRowsData() {
+	std::vector<bool> v;
+
+	switch (numberOfEncodedRows) {
+		case NoneRows:
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(false);
+			break;
+		case One:
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(true);
+			break;
+		case Two:
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(false);
+			break;
+		case Three:
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(true);
+			break;
+		case Four:
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(false);
+			v.push_back(false);
+			break;
+		case Five:
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(false);
+			v.push_back(true);
+			break;
+		case Six:
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(true);
+			v.push_back(false);
+			break;
+		case Seven:
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(true);
+			v.push_back(true);
+			break;
+		case Eight:
+			v.push_back(true);
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(false);
+			break;
+		case Nine:
+			v.push_back(true);
+			v.push_back(false);
+			v.push_back(false);
+			v.push_back(true);
+			break;
+		case Ten:
+			v.push_back(true);
+			v.push_back(false);
+			v.push_back(true);
+			v.push_back(false);
+			break;
+	}
+}
+
+
+void Utility::writeSelectedNumberOfRowsData(std::vector<bool> b) {
+	if (b[0] == false && b[1] == false && b[2] == false && b[3] == false) {
+		numberOfEncodedRows = NoneRows;
+	}
+	else if (b[0] == false && b[1] == false && b[2] == false && b[3] == true) {
+		numberOfEncodedRows = One;
+	}
+	else if (b[0] == false && b[1] == false && b[2] == true && b[3] == false) {
+		numberOfEncodedRows = Two;
+	}
+	else if (b[0] == false && b[1] == false && b[2] == true && b[3] == true) {
+		numberOfEncodedRows = Three;
+	}
+	else if (b[0] == false && b[1] == true && b[2] == false && b[3] == false) {
+		numberOfEncodedRows = Four;
+	}
+	else if (b[0] == false && b[1] == true && b[2] == false && b[3] == true) {
+		numberOfEncodedRows = Five;
+	}
+	else if (b[0] == false && b[1] == true && b[2] == true && b[3] == false) {
+		numberOfEncodedRows = Six;
+	}
+		else if (b[0] == false && b[1] == true && b[2] == true && b[3] == true) {
+		numberOfEncodedRows = Seven;
+	}
+		else if (b[0] == true && b[1] == false && b[2] == false && b[3] == false) {
+		numberOfEncodedRows = Eight;
+	}
+		else if (b[0] == true && b[1] == false && b[2] == false && b[3] == true) {
+		numberOfEncodedRows = Nine;
+	}
+		else if (b[0] == true && b[1] == false && b[2] == true && b[3] == false) {
+		numberOfEncodedRows = Ten;
+	}
 }

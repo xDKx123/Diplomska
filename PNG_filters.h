@@ -17,22 +17,22 @@ class PNG_filters
 {
 private:
 
-	struct Values {
-		SelectedFilter sf;
-		char encodedValue;
-		//std::vector<short> *values;
+	// struct Values {
+	// 	SelectedFilter sf;
+	// 	char encodedValue;
+	// 	//std::vector<short> *values;
 
-		//Values(SelectedFilter sf,std::vector<short>* values) {
-		//	this->sf = sf;
-		//	this->values = values;
-		//}
-		//short encodedValue;
+	// 	//Values(SelectedFilter sf,std::vector<short>* values) {
+	// 	//	this->sf = sf;
+	// 	//	this->values = values;
+	// 	//}
+	// 	//short encodedValue;
 
-		Values(short val) {
-			sf = SelectedFilter::None;
-			encodedValue = val;
-		}
-	};
+	// 	Values(short val) {
+	// 		sf = SelectedFilter::NoneFilter;
+	// 		encodedValue = val;
+	// 	}
+	// };
 
 	cv::Mat image;
 
