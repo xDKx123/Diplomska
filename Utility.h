@@ -27,7 +27,6 @@
 class Utility
 {
 private:
-	static std::string randomName();
 public:
 	inline static const std::string validImageFileExtension = ".bmp";
 	inline static const std::string validEncryptedFileExtension = ".bin";
@@ -47,5 +46,8 @@ public:
 	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
 
 	static void resizeImage(std::string fileName);
+
+	static std::vector<bool> writeSelectedNumberOfRowsData();
+	static void writeSelectedNumberOfRowsData(std::vector<bool> b);
 };
 

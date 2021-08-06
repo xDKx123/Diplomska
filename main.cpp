@@ -38,6 +38,8 @@ int main(int argc, char* argv) {
 			break;
 
 		case 2: {
+			numberOfEncodedRows = NoneRows;
+
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
 				std::vector<char>* v = pngFilters->Encode();
@@ -46,11 +48,11 @@ int main(int argc, char* argv) {
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-				//start = std::chrono::system_clock::now();
-				//auto key = townsend::algorithm::bwtEncode(v->begin(), v->end());
-				//end = std::chrono::system_clock::now();
-				//int index = std::distance(v->begin(), key);
-				//std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				start = std::chrono::system_clock::now();
+				auto key = townsend::algorithm::bwtEncode(v->begin(), v->end());
+				end = std::chrono::system_clock::now();
+				int index = std::distance(v->begin(), key);
+				std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
@@ -78,7 +80,7 @@ int main(int argc, char* argv) {
 
 
 				start = std::chrono::system_clock::now();
-				Utility::writeBinFile(size.width, size.height, 0, mtfTransformed, tree, probability);
+				Utility::writeBinFile(size.width, size.height, index, mtfTransformed, tree, probability);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				v->clear();
@@ -128,11 +130,11 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			/*auto key2 = std::next(mtfDecode->begin(), index);
+			auto key2 = std::next(mtfDecode->begin(), index);
 			start = std::chrono::system_clock::now();
 			townsend::algorithm::bwtDecode(mtfDecode->begin(), mtfDecode->end(), key2);
 			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;*/
+			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 			//std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
 
