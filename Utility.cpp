@@ -5,7 +5,7 @@
 /// </summary>
 /// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
-		return "images/random1.bmp";
+		return "testing.bmp";
 }
 
 /// <summary>
@@ -265,7 +265,7 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 	}
 	else {
 		//for (int x = 0; x < static_cast<int>(std::ceil(static_cast<float>(width) / static_cast<int>(numberOfEncodedRows))); x++) {
-		for (int x = 0; x < width; x += static_cast<int>(numberOfEncodedRows)) {
+		for (int x = 0; x < height; x += static_cast<int>(numberOfEncodedRows)) {
 			std::vector<bool> selFilter;
 			for (int y = 0; y < 2; y++) {
 				bool b = binReader->readBit();
@@ -286,6 +286,7 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 			}
 			selFilter.clear();
 		}
+
 	}
 	/*bool b1 = binReader->readBit();
 	bool b2 = binReader->readBit();
@@ -302,6 +303,7 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 	else if (b1 == true && b2 == true) {
 		currentSelectedFilter = Paeth;
 	}*/
+	std::cout << "Sel filter:" << selectedFilter.size() << std::endl;
 
 	std::vector<bool> data;
 	while (!binReader->isEof()) {

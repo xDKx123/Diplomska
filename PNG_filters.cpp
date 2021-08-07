@@ -212,10 +212,6 @@ std::tuple<std::vector<SelectedFilter>, std::vector<char>> PNG_filters::Encode()
 
 	}
 	else {
-		//std::vector<short> encodedSub;
-		//std::vector<short> encodedUp;
-		//std::vector<short> encodedAvg;
-		//std::vector<short> encodedPaeth;
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < width; y++) {
 				cv::Vec3b current = image.at<cv::Vec3b>(x, y);
@@ -277,7 +273,7 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<SelectedFilter> s
 
 	if (numberOfEncodedRows != NoneRows) {
 		int heightIndex = 0;
-		for (int u = 0; u < selectedFilter.size(); u++) {
+		for (int u = 0; u < selectedFilter.size(); u++, heightIndex += static_cast<int>(numberOfEncodedRows)) {
 			for (int x = heightIndex; x < height && x < heightIndex + static_cast<int>(numberOfEncodedRows); x++) {
 				for (int y = 0; y < width; y++) {
 					cv::Vec3b current;
