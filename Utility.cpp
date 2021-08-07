@@ -273,18 +273,18 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 			}
 
 			if (selFilter[0] == false && selFilter[1] == false) {
-				selFilter.push_back(Sub);
+				selectedFilter.push_back(Sub);
 			}
 			else if (selFilter[0] == false && selFilter[1] == true) {
-				selFilter.push_back(Up);
+				selectedFilter.push_back(Up);
 			}
 			else if (selFilter[0] == true && selFilter[1] == false) {
-				selFilter.push_back(Average);
+				selectedFilter.push_back(Average);
 			}
 			else if (selFilter[0] == true && selFilter[1] == true) {
-				selFilter.push_back(Paeth);
+				selectedFilter.push_back(Paeth);
 			}
-			selectedFilter.clear();
+			selFilter.clear();
 		}
 	}
 	/*bool b1 = binReader->readBit();
@@ -303,22 +303,22 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 		currentSelectedFilter = Paeth;
 	}*/
 
-	std::vector<bool>* data = new std::vector<bool>;
+	std::vector<bool> data;
 	while (!binReader->isEof()) {
-		data->push_back(binReader->readBit());
+		data.push_back(binReader->readBit());
 	}
 
-	while (data->back() != true) {
-		data->pop_back();
+	while (data.back() != true) {
+		data.pop_back();
 	}
 
 	for (int x = 0; x < 8; x++) {
-		data->pop_back();
+		data.pop_back();
 	}
 
 	delete binReader;
 
-	return std::tuple<int, int, int, std::vector<bool>*, std::map<char, float>>(width, height, index, data, probability);
+	return std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>>(width, height, index, selectedFilter, data, probability);
 }
 
 /// <summary>
