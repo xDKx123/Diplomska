@@ -10,7 +10,6 @@
 #include "Utility.h"
 #include "MTF.h"
 #include "Huffman.h"
-#include "Huffman.cpp"
 
 #include "additional_library/bwt.hpp"
 
@@ -66,12 +65,12 @@ int main(int argc, char* argv) {
 
 
 
-				Huffman* hf = new Huffman();
+				Huffman* huffman = new Huffman();
 
 				start = std::chrono::system_clock::now();
 				std::map<char, std::vector<bool>> tree;
 				std::map<char, float> probability;
-				std::tie(tree, probability) = hf->Encode(mtfTransformed);
+				std::tie(tree, probability) = huffman->Encode(mtfTransformed);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -88,9 +87,12 @@ int main(int argc, char* argv) {
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				
+				
 
 				std::cout << "\nFile compression: " << Utility::compressionFactor(fileName, "out.bin") << std::endl;
 				
+				delete mtf;
+				//delete hf;
 			}
 			else {
 				std::cout << "Najprej nalo�ite sliko." << std::endl;
@@ -146,6 +148,9 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje PNG dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 			Utility::writeBmpFile(image);
 
+			delete huffman;
+			delete mtf;
+			delete png;
 			break;
 		}
 

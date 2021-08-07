@@ -1,5 +1,4 @@
 #include "Huffman.h"
-#include "Utility.h"
 
 /// <summary>
 /// Za vsak znak dobimo njegov binarni zapis
@@ -80,7 +79,7 @@ std::map<char, float> Huffman::calculateProbability(std::map<char, int> mp, int 
 {
 	std::map<char, float> cf;
 
-	for (auto p : mp) {
+	for (auto &p : mp) {
 		if (p.second != 0) {
 			cf.insert(std::pair<char, float>(p.first, static_cast<float>(static_cast<double>(p.second) / size)));
 		}

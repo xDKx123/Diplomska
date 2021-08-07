@@ -6,6 +6,8 @@
 #include <queue>
 #include <optional>
 
+#include "Utility.h"
+
 class Huffman
 {
 private:
