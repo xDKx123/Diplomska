@@ -259,10 +259,10 @@ std::tuple<std::vector<SelectedFilter>, std::vector<char>> PNG_filters::Encode()
 /// <param name="height">vi�ina slike</param>
 /// <param name="values">slikovni podatki</param>
 /// <returns></returns>
-cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
+cv::Mat PNG_filters::Decode(int width, int height, std::vector<SelectedFilter> selectedFilter, std::vector<char> values)
 {
 	//Preverimo �e je koli�ina podatkov za zapis v sliko ustrezna
-	if (values->size() != width * height * 3) {
+	if (values.size() != width * height * 3) {
 		std::cerr << "Velikost ni pravilna" << std::endl;
 		image = NULL;
 		return image;
@@ -275,34 +275,70 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<char>* values)
 	
 	image = cv::Mat(cv::Size(width, height), CV_8UC3);
 
-	for (int x = 0; x < height; x++) {
-		for (int y = 0; y < width; y++) {
-			cv::Vec3b current;
-			cv::Vec3b left;
-			cv::Vec3b up;
-			cv::Vec3b leftUp;
+	if (numberOfEncodedRows != NoneRows) {
+		int heightIndex = 0;
+		for (int u = 0; u < selectedFilter.size(); u++) {
+			for (int x = heightIndex; x < height && x < heightIndex + static_cast<int>(numberOfEncodedRows); x++) {
+				for (int y = 0; y < width; y++) {
+					cv::Vec3b current;
+					cv::Vec3b left;
+					cv::Vec3b up;
+					cv::Vec3b leftUp;
 
-			left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
-			up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
-			leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
+					left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
+					up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
+					leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
 
-			for (int z = 0; z < 3; z++, index++) {
-				if (currentSelectedFilter == Sub) {
-					current[z] = left != nullCheck ? filterSubDecode(values->at(index), left[z]) : values->at(index);
-				}
-				else if (currentSelectedFilter == Up) {
-					current[z] = up != nullCheck ? filterUpDecode(values->at(index), up[z]) : values->at(index);
-				}
-				else if (currentSelectedFilter == Average) {
-					current[z] =left != nullCheck && up != nullCheck ? filterAverageDecode(values->at(index), left[z], up[z]) : values->at(index);
-				}
-				else if (currentSelectedFilter == Paeth)
-				{
-					current[z] = left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPaethDecode(values->at(index), left[z], up[z], leftUp[z]) : values->at(index);
+					for (int z = 0; z < 3; z++, index++) {
+						if (selectedFilter.at(u) == Sub) {
+							current[z] = left != nullCheck ? filterSubDecode(values.at(index), left[z]) : values.at(index);
+						}
+						else if (selectedFilter.at(u) == Up) {
+							current[z] = up != nullCheck ? filterUpDecode(values.at(index), up[z]) : values.at(index);
+						}
+						else if (selectedFilter.at(u) == Average) {
+							current[z] = left != nullCheck && up != nullCheck ? filterAverageDecode(values.at(index), left[z], up[z]) : values.at(index);
+						}
+						else if (selectedFilter.at(u) == Paeth)
+						{
+							current[z] = left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPaethDecode(values.at(index), left[z], up[z], leftUp[z]) : values.at(index);
+						}
+					}
+					image.at<cv::Vec3b>(x, y) = current;
 				}
 			}
+		}
+	}
+	else {
+		for (int x = 0; x < height; x++) {
+			for (int y = 0; y < width; y++) {
+				cv::Vec3b current;
+				cv::Vec3b left;
+				cv::Vec3b up;
+				cv::Vec3b leftUp;
 
-			image.at<cv::Vec3b>(x, y) = current;
+				left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
+				up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
+				leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
+
+				for (int z = 0; z < 3; z++, index++) {
+					if (selectedFilter.at(0) == Sub) {
+						current[z] = left != nullCheck ? filterSubDecode(values.at(index), left[z]) : values.at(index);
+					}
+					else if (selectedFilter.at(0) == Up) {
+						current[z] = up != nullCheck ? filterUpDecode(values.at(index), up[z]) : values.at(index);
+					}
+					else if (selectedFilter.at(0) == Average) {
+						current[z] = left != nullCheck && up != nullCheck ? filterAverageDecode(values.at(index), left[z], up[z]) : values.at(index);
+					}
+					else if (selectedFilter.at(0) == Paeth)
+					{
+						current[z] = left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPaethDecode(values.at(index), left[z], up[z], leftUp[z]) : values.at(index);
+					}
+				}
+
+				image.at<cv::Vec3b>(x, y) = current;
+			}
 		}
 	}
 

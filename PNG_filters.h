@@ -61,7 +61,7 @@ public:
 	~PNG_filters();
 
 	std::tuple<std::vector<SelectedFilter>, std::vector<char>> Encode();
-	cv::Mat Decode(int width, int height, std::vector<char>* values);
+	cv::Mat Decode(int width, int height, std::vector<SelectedFilter> selectedFilter, std::vector<char> values);
 
 	cv::Size getSize();
 	cv::Mat getImage();

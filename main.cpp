@@ -34,11 +34,11 @@ int main(int argc, char* argv) {
 			//pngFilters = new PNG_filters(Utility::getImage());
 			fileName = Utility::getImage();
 			pngFilters = new PNG_filters(fileName);
-		}
 			break;
+		}
 
 		case 2: {
-			numberOfEncodedRows = NoneRows;
+			//numberOfEncodedRows = NoneRows;
 
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
@@ -84,7 +84,7 @@ int main(int argc, char* argv) {
 
 
 				start = std::chrono::system_clock::now();
-				Utility::writeBinFile(size.width, size.height, index, mtfTransformed, tree, probability);
+				Utility::writeBinFile(size.width, size.height, index, selectedFilter, mtfTransformed, tree, probability);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 				
@@ -95,27 +95,28 @@ int main(int argc, char* argv) {
 			else {
 				std::cout << "Najprej nalo�ite sliko." << std::endl;
 			}
-		}
 			break;
+		}
 
 
 		case 3: {
 			int width, height, index;
-			std::vector<bool>* data;
+			std::vector<bool> data;
 			std::map<char, float> probability;
+			std::vector<SelectedFilter> selectedFilter;
 
 			auto start = std::chrono::system_clock::now();
-			std::tie(width, height, index, data, probability) = Utility::readBinFile();
+			std::tie(width, height, index, selectedFilter, data, probability) = Utility::readBinFile();
 			auto end = std::chrono::system_clock::now();
 			std::cout << "Trajanje branja binarne datoteke: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
 			//std::cout << "data: " << data->size() << std::endl;
 
-			Huffman<float>* huffman = new Huffman<float>();
+			Huffman* huffman = new Huffman();
 
 			start = std::chrono::system_clock::now();
-			std::vector<char>* chars = huffman->Decode(data, probability);
+			std::vector<char> chars = huffman->Decode(data, probability);
 			end = std::chrono::system_clock::now();
 			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -124,7 +125,7 @@ int main(int argc, char* argv) {
 
 			MTF* mtf = new MTF();
 			start = std::chrono::system_clock::now();
-			std::vector<char>* mtfDecode = mtf->Decode(chars);
+			std::vector<char> mtfDecode = mtf->Decode(chars);
 			end = std::chrono::system_clock::now();
 			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -140,13 +141,13 @@ int main(int argc, char* argv) {
 			PNG_filters* png = new PNG_filters();
 
 			start = std::chrono::system_clock::now();
-			cv::Mat image = png->Decode(width, height, mtfDecode);
+			cv::Mat image = png->Decode(width, height, selectedFilter, mtfDecode);
 			end = std::chrono::system_clock::now();
 			std::cout << "Trajanje PNG dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 			Utility::writeBmpFile(image);
 
+			break;
 		}
-			  break;
 
 		// case 4: {
 		// 	std::string file = Utility::getImage();
@@ -161,215 +162,215 @@ int main(int argc, char* argv) {
 
 			std::cout << "\nFile compression: " << Utility::compressionFactor(file1, file2) << std::endl;
 
+			break;
 		}
-			  break;
 
-		case 90: {
-			std::string file1 = Utility::getImage();
+		//case 90: {
+		//	std::string file1 = Utility::getImage();
 
-			PNG_filters* png1 = new PNG_filters(file1);
-			cv::Size sz = png1->getSize();
-			cv::Mat mat1 = png1->getImage();
+		//	PNG_filters* png1 = new PNG_filters(file1);
+		//	cv::Size sz = png1->getSize();
+		//	cv::Mat mat1 = png1->getImage();
 
-			std::vector<char> *res = png1->Encode();
+		//	std::vector<char> *res = png1->Encode();
 
-			png1 = new PNG_filters(file1);
-			cv::Mat mat2 = png1->Decode(sz.width, sz.height, res);
+		//	png1 = new PNG_filters(file1);
+		//	cv::Mat mat2 = png1->Decode(sz.width, sz.height, res);
 
-			std::cout << "Image is same: " << Utility::compareImages(mat1, mat2) <<std::endl;
-		}
-			   break;
+		//	std::cout << "Image is same: " << Utility::compareImages(mat1, mat2) <<std::endl;
+		//}
+		//	   break;
 
-		case 91: {
-			//BWT
-			std::cout << "TEST:" << std::endl;
+		//case 91: {
+		//	//BWT
+		//	std::cout << "TEST:" << std::endl;
 
-			std::vector<char> testingBWT;
-			std::vector<char> check;
-			
-			for (int x = 0; x < 100; x++) {
-				for (int y = 0; y < 256;y++) {
-					char ca = rand() % 256;
-					testingBWT.push_back(static_cast<char>(ca));
-					check.push_back(static_cast<char>(ca));
-				}
-			}
+		//	std::vector<char> testingBWT;
+		//	std::vector<char> check;
+		//	
+		//	for (int x = 0; x < 100; x++) {
+		//		for (int y = 0; y < 256;y++) {
+		//			char ca = rand() % 256;
+		//			testingBWT.push_back(static_cast<char>(ca));
+		//			check.push_back(static_cast<char>(ca));
+		//		}
+		//	}
 
-			std::cout << "Generated array" << std::endl;
+		//	std::cout << "Generated array" << std::endl;
 
-			auto key = townsend::algorithm::bwtEncode(testingBWT.begin(), testingBWT.end());
+		//	auto key = townsend::algorithm::bwtEncode(testingBWT.begin(), testingBWT.end());
 
-			// for (int x = 0; x < 100; x++) {
-			// 	std::cout << testingBWT[x];
-			// }
-			// std::cout << std::endl;
+		//	// for (int x = 0; x < 100; x++) {
+		//	// 	std::cout << testingBWT[x];
+		//	// }
+		//	// std::cout << std::endl;
 
-			int index = std::distance(testingBWT.begin(),key);
+		//	int index = std::distance(testingBWT.begin(),key);
 
-			std::cout << "Encode" << std::endl;
+		//	std::cout << "Encode" << std::endl;
 
 
-			BinWriter *bw = new BinWriter("testingBwt.bin");
-			bw->writeInt(index);
-			// std::cout << "index: " << testingBWT.size() << std::endl;
-			for (auto it : testingBWT) {
-				bw->writeByte(it);
-			// 	std::cout << it;
-			 }
-			// std::cout << std::endl;
+		//	BinWriter *bw = new BinWriter("testingBwt.bin");
+		//	bw->writeInt(index);
+		//	// std::cout << "index: " << testingBWT.size() << std::endl;
+		//	for (auto it : testingBWT) {
+		//		bw->writeByte(it);
+		//	// 	std::cout << it;
+		//	 }
+		//	// std::cout << std::endl;
 
-			// for (int x = 0; x < 7; x++) {
-			// 	bw->writeBit(false);
-			// }
-			// bw->writeBit(true);
+		//	// for (int x = 0; x < 7; x++) {
+		//	// 	bw->writeBit(false);
+		//	// }
+		//	// bw->writeBit(true);
 
-			delete bw;
+		//	delete bw;
 
-			std::vector<char> data;
+		//	std::vector<char> data;
 
-			BinReader *br = new BinReader("testingBwt.bin");
-			for (int x = 0; x < 8; x++) {
-				bool b = br->readBit();
-			}
+		//	BinReader *br = new BinReader("testingBwt.bin");
+		//	for (int x = 0; x < 8; x++) {
+		//		bool b = br->readBit();
+		//	}
 
-			index = br->readInt();
+		//	index = br->readInt();
 
-			while (!br->isEof()) {
-				data.push_back(br->readByte());
-			}
+		//	while (!br->isEof()) {
+		//		data.push_back(br->readByte());
+		//	}
 
-			data.pop_back();
+		//	data.pop_back();
 
-			for (int x = 0; x < 100; x++) {
-				std::cout << data[x];
-			}
-			std::cout << std::endl;
-			// while (data.back() != true) {
-			// 	data.pop_back();
-			// }
+		//	for (int x = 0; x < 100; x++) {
+		//		std::cout << data[x];
+		//	}
+		//	std::cout << std::endl;
+		//	// while (data.back() != true) {
+		//	// 	data.pop_back();
+		//	// }
 
-			// for (int x = 0; x < 8; x++) {
-			// 	data.pop_back();
-			// }
+		//	// for (int x = 0; x < 8; x++) {
+		//	// 	data.pop_back();
+		//	// }
 
-			delete br;
+		//	delete br;
 
-			// std::cout << "index: " << data.size() << std::endl;
-			
-			auto key2 = std::next(data.begin(), index);
+		//	// std::cout << "index: " << data.size() << std::endl;
+		//	
+		//	auto key2 = std::next(data.begin(), index);
 
-			townsend::algorithm::bwtDecode(data.begin(), data.end(), key2);
+		//	townsend::algorithm::bwtDecode(data.begin(), data.end(), key2);
 
-			std::cout << "Decode" << std::endl;
+		//	std::cout << "Decode" << std::endl;
 
-			// for (auto it : testingBWT) {
-			// 	std::cout << it;
-			// }
-			// std::cout << std::endl;
+		//	// for (auto it : testingBWT) {
+		//	// 	std::cout << it;
+		//	// }
+		//	// std::cout << std::endl;
 
-			// for (int x = 0; x < testingBWT.size(); x++) {
-			// 	if (data[x] != check[x]) {
-			// 		std::cout << "Test failed at index: " << x << std::endl;
-			// 		break;
-			// 	}
-			// }
+		//	// for (int x = 0; x < testingBWT.size(); x++) {
+		//	// 	if (data[x] != check[x]) {
+		//	// 		std::cout << "Test failed at index: " << x << std::endl;
+		//	// 		break;
+		//	// 	}
+		//	// }
 
-			std::cout << "Test passed" << std::endl;
-			
-		}
-			   break;
+		//	std::cout << "Test passed" << std::endl;
+		//	
+		//}
+		//	   break;
 
-		case 92: {
-			//MTF
-			std::vector<char>* v = new std::vector<char>;
-			v->push_back('p');
-			v->push_back('a');
-			v->push_back('n');
-			v->push_back('a');
-			v->push_back('m');
-			v->push_back('a');
+		//case 92: {
+		//	//MTF
+		//	std::vector<char>* v = new std::vector<char>;
+		//	v->push_back('p');
+		//	v->push_back('a');
+		//	v->push_back('n');
+		//	v->push_back('a');
+		//	v->push_back('m');
+		//	v->push_back('a');
 
-			MTF* mtf = new MTF();
-			std::vector<char>* res = mtf->Encode(v);
+		//	MTF* mtf = new MTF();
+		//	std::vector<char>* res = mtf->Encode(v);
 
-			delete mtf;
+		//	delete mtf;
 
-			mtf = new MTF();
+		//	mtf = new MTF();
 
-			std::vector<char>* decodec = mtf->Decode(res);
+		//	std::vector<char>* decodec = mtf->Decode(res);
 
-			std::cout << std::endl;
-			
-		}
-			   break;
-		case 93: {
-			//Huffman
-			std::vector<char>* v = new std::vector<char>;
-			v->push_back('t');
-			v->push_back('e');
-			v->push_back('s');
-			v->push_back('t');
-			v->push_back('1');
-			v->push_back('2');
-			v->push_back('3');
-			v->push_back('a');
-			v->push_back('b');
-			v->push_back('c');
-			v->push_back('d');
-			v->push_back('e');
-			v->push_back('f');
-			v->push_back('\n');
-			v->push_back('\n');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('d');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
-			v->push_back('e');
+		//	std::cout << std::endl;
+		//	
+		//}
+		//	   break;
+		//case 93: {
+		//	//Huffman
+		//	std::vector<char>* v = new std::vector<char>;
+		//	v->push_back('t');
+		//	v->push_back('e');
+		//	v->push_back('s');
+		//	v->push_back('t');
+		//	v->push_back('1');
+		//	v->push_back('2');
+		//	v->push_back('3');
+		//	v->push_back('a');
+		//	v->push_back('b');
+		//	v->push_back('c');
+		//	v->push_back('d');
+		//	v->push_back('e');
+		//	v->push_back('f');
+		//	v->push_back('\n');
+		//	v->push_back('\n');
+		//	v->push_back('d');
+		//	v->push_back('d');
+		//	v->push_back('d');
+		//	v->push_back('d');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
+		//	v->push_back('e');
 
-			MTF* mtf1 = new MTF();
-			std::vector<char>* mtf1Dec = mtf1->Encode(v);
+		//	MTF* mtf1 = new MTF();
+		//	std::vector<char>* mtf1Dec = mtf1->Encode(v);
 
-			Huffman<int>* hff = new Huffman<int>();
-			
-			std::map<char, std::vector<bool>> tree;
-			std::map<char, float> probability;
-			std::tie(tree, probability) = hff->Encode(mtf1Dec);
+		//	Huffman<int>* hff = new Huffman<int>();
+		//	
+		//	std::map<char, std::vector<bool>> tree;
+		//	std::map<char, float> probability;
+		//	std::tie(tree, probability) = hff->Encode(mtf1Dec);
 
-			delete hff;
+		//	delete hff;
 
-			Utility::writeBinFile(0, 0,0, mtf1Dec, tree, probability);
+		//	Utility::writeBinFile(0, 0,0, mtf1Dec, tree, probability);
 
-			std::cout << "mtf: " << mtf1Dec->size() << std::endl;
+		//	std::cout << "mtf: " << mtf1Dec->size() << std::endl;
 
-			int width, height, idx;
-			std::vector<bool>* data;
-			std::map<char, float> probability2;
+		//	int width, height, idx;
+		//	std::vector<bool>* data;
+		//	std::map<char, float> probability2;
 
-			std::tie(width, height, idx, data, probability2) = Utility::readBinFile();
+		//	std::tie(width, height, idx, data, probability2) = Utility::readBinFile();
 
-			Huffman<float>* huffman = new Huffman<float>();
-			std::vector<char>* chars = huffman->Decode(data, probability);
+		//	Huffman<float>* huffman = new Huffman<float>();
+		//	std::vector<char>* chars = huffman->Decode(data, probability);
 
-			MTF* mtf = new MTF();
-			std::vector<char>* mtfDec = mtf->Decode(chars);
+		//	MTF* mtf = new MTF();
+		//	std::vector<char>* mtfDec = mtf->Decode(chars);
 
-			std::cout << "mtf: " << mtfDec->size() << std::endl;
-			//std::cout << "NOT YET IMPLEMENTED" << std::endl;
-		}
-			   break;
+		//	std::cout << "mtf: " << mtfDec->size() << std::endl;
+		//	//std::cout << "NOT YET IMPLEMENTED" << std::endl;
+		//}
+		//	   break;
 		case 0:
 			running = false;
 			break;
