@@ -36,14 +36,13 @@ public:
 	static void displayImage(cv::Mat image);
 	static bool compareImages(cv::Mat image1, cv::Mat image2);
 	static int menu();
-	static std::vector<char>* commonDictionaryVector();
+	static std::vector<char> commonDictionaryVector();
 	static std::map<char, int> commonDictionaryMap();
 
 	static double compressionFactor(std::string originalFile, std::string compressedFile);
-	static void writeBinFile(int width, int height,int index, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability);
+	static void writeBinFile(int width, int height,int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability);
 	static void writeBmpFile(cv::Mat image);
-	static std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> readBinFile();
-	//MessageBox(NULL, ofn.lpstrFile, (LPCWSTR)"File Name", MB_OK););
+	static std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> readBinFile();
 
 	static void resizeImage(std::string fileName);
 

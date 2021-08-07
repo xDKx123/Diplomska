@@ -154,6 +154,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MTF.cpp" />
     <ClCompile Include="PNG_filters.cpp" />
+    <ClCompile Include="SelectedFilter.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="Huffman.h" />
     <ClInclude Include="MTF.h" />
     <ClInclude Include="PNG_filters.h" />
+    <ClInclude Include="SelectedFilter.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

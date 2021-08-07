@@ -71,10 +71,10 @@ int Utility::menu() {
 /// Vrne slovar, ki zajema vseh 256 znakov
 /// </summary>
 /// <returns>std::vector<char> - 256 znakov</returns>
-std::vector<char>* Utility::commonDictionaryVector() {
-	std::vector<char>* v = new std::vector<char>;
+std::vector<char> Utility::commonDictionaryVector() {
+	std::vector<char> v;
 	for (int x = 0; x < 256; x++) {
-		v->push_back(static_cast<char>(x));
+		v.push_back(static_cast<char>(x));
 	}
 	return v;
 }
@@ -109,6 +109,7 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 		}
 	}
 	catch (...) {
+
 	}
 	return 0.0;
 }
@@ -121,7 +122,7 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 /// <param name="items">slikovni podatki</param>
 /// <param name="encodedValues">binarni podatki posameznega znaka</param>
 /// <param name="probability">verjetnostna tabela</param>
-void Utility::writeBinFile(int width, int height, int index, std::vector<char>* items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
+void Utility::writeBinFile(int width, int height, int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
 {
 	//dodaj zapise za glavo
 	std::string fileName = "out" + validEncryptedFileExtension;
@@ -141,36 +142,41 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<char>* 
 		}
 	}
 
-	selectedNumberOfRowsData();
+	for (auto currentSelectedFilter : selectedFilter) {
+		std::vector<char> selFilter;
+		if (currentSelectedFilter == Sub) {
+			selFilter.push_back(false);
+			selFilter.push_back(false);
+		}
+		else if (currentSelectedFilter == Up) {
+			selFilter.push_back(false);
+			selFilter.push_back(true);
+		}
+		else if (currentSelectedFilter == Average) {
+			selFilter.push_back(true);
+			selFilter.push_back(false);
+		}
+		else if (currentSelectedFilter == Paeth) {
+			selFilter.push_back(true);
+			selFilter.push_back(true);
+		}
 
-	std::vector<char> selFilter;
-	if (currentSelectedFilter == Sub) {
-		selFilter.push_back(false);
-		selFilter.push_back(false);
-	}
-	else if (currentSelectedFilter == Up) {
-		selFilter.push_back(false);
-		selFilter.push_back(true);
-	}
-	else if (currentSelectedFilter == Average) {
-		selFilter.push_back(true);
-		selFilter.push_back(false);
-	}
-	else if (currentSelectedFilter == Paeth) {
-		selFilter.push_back(true);
-		selFilter.push_back(true);
+		for (auto c : selFilter) {
+			binWriter->writeBit(c);
+		}
+
+		selFilter.clear();
 	}
 
-	for (auto c : selFilter) {
-		binWriter->writeBit(c);
-	}
+
+
 
 	//for (auto pair : probability) {
 	//	//binWriter->writeByte(pair.first);
 	//	binWriter->writeFloat(probability[pair]);
 	//}
 
-	for (auto item : *items) {
+	for (auto item : items) {
 		for (auto v : encodedValues[item]) {
 			binWriter->writeBit(v);
 		}
@@ -195,10 +201,11 @@ void Utility::writeBmpFile(cv::Mat image)
 	//std::string fileName = randomName() + validImageFileExtension;
 	std::string fileName = "out" + validImageFileExtension;
 
-	if (cv::imwrite(fileName, image)) {
+	try {
+		cv::imwrite(fileName, image);
 		std::cout << "Ustvarjena datoteka: " << fileName << std::endl;
 	}
-	else {
+	catch (std::exception& e) {
 		std::cout << "Napaka pri zapisu datoteke" << std::endl;
 	}
 }
@@ -207,7 +214,7 @@ void Utility::writeBmpFile(cv::Mat image)
 /// Branje binarne datoteke
 /// </summary>
 /// <returns>�irina, vi�ina, verjetnostna tabela, slikovni podatki</returns>
-std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::readBinFile()
+std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> Utility::readBinFile()
 {
 	//NE DIRAJ KER DELA
 	//std::string fileName = getImage();
@@ -234,7 +241,53 @@ std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::rea
 		}
 	}
 
-	bool b1 = binReader->readBit();
+	std::vector<SelectedFilter> selectedFilter;
+
+	if (numberOfEncodedRows == NoneRows) {
+		std::vector<bool> selFilter;
+		for (int y = 0; y < 2; y++) {
+			bool b = binReader->readBit();
+			selFilter.push_back(b);
+		}
+
+		if (selFilter[0] == false && selFilter[1] == false) {
+			selectedFilter.push_back(Sub);
+		}
+		else if (selFilter[0] == false && selFilter[1] == true) {
+			selectedFilter.push_back(Up);
+		}
+		else if (selFilter[0] == true && selFilter[1] == false) {
+			selectedFilter.push_back(Average);
+		}
+		else if (selFilter[0] == true && selFilter[1] == true) {
+			selectedFilter.push_back(Paeth);
+		}
+	}
+	else {
+		//for (int x = 0; x < static_cast<int>(std::ceil(static_cast<float>(width) / static_cast<int>(numberOfEncodedRows))); x++) {
+		for (int x = 0; x < width; x += static_cast<int>(numberOfEncodedRows)) {
+			std::vector<bool> selFilter;
+			for (int y = 0; y < 2; y++) {
+				bool b = binReader->readBit();
+				selFilter.push_back(b);
+			}
+
+			if (selFilter[0] == false && selFilter[1] == false) {
+				selFilter.push_back(Sub);
+			}
+			else if (selFilter[0] == false && selFilter[1] == true) {
+				selFilter.push_back(Up);
+			}
+			else if (selFilter[0] == true && selFilter[1] == false) {
+				selFilter.push_back(Average);
+			}
+			else if (selFilter[0] == true && selFilter[1] == true) {
+				selFilter.push_back(Paeth);
+			}
+			selectedFilter.clear();
+		}
+	}
+	/*bool b1 = binReader->readBit();
 	bool b2 = binReader->readBit();
 
 	if (b1 == false && b2 == false) {
@@ -248,7 +301,7 @@ std::tuple<int, int,int, std::vector<bool>*, std::map<char, float>> Utility::rea
 	}
 	else if (b1 == true && b2 == true) {
 		currentSelectedFilter = Paeth;
-	}
+	}*/
 
 	std::vector<bool>* data = new std::vector<bool>;
 	while (!binReader->isEof()) {

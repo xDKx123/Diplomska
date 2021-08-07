@@ -16,17 +16,17 @@ void PNG_filters::showImage() {
 	}
 }
 
-int PNG_filters::sumElementsInVector(std::vector<short>* v)
+int PNG_filters::sumElementsInVector(std::vector<short> v)
 {
-	return std::accumulate(v->begin(), v->end(), (int)0, [](int acc, const short val) {return acc + std::abs(val); });
+	return std::accumulate(v.begin(), v.end(), (int)0, [](int acc, const short val) {return acc + std::abs(val); });
 }
 
-std::vector<char>* PNG_filters::createCompressedVector(std::vector<short>* v)
+std::vector<char> PNG_filters::createCompressedVector(std::vector<short> v)
 {
-	std::vector<char>* comp = new std::vector<char>;
+	std::vector<char> comp;
 	//comp->push_back(static_cast<char> (sf));
-	for (auto x : *v) {
-		comp->push_back(static_cast<char> (x));
+	for (auto x : v) {
+		comp.push_back(static_cast<char> (x));
 	}
 	return comp;
 }
@@ -39,7 +39,7 @@ std::vector<char>* PNG_filters::createCompressedVector(std::vector<short>* v)
 /// <param name="average"></param>
 /// <param name="paeth"></param>
 /// <returns></returns>
-std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth)
+std::tuple<SelectedFilter, std::vector<char>> PNG_filters::hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth)
 {
 	std::vector<int> sums;
 	sums.push_back(sumElementsInVector(sub));
@@ -49,29 +49,31 @@ std::vector<char>* PNG_filters::hevristics(std::vector<short>* sub, std::vector<
 
 	switch (std::distance(sums.begin(), std::min_element(sums.begin(), sums.end()))) {
 		case 0: {
-			std::cout << "Filter SUB" << std::endl;
-			currentSelectedFilter = SelectedFilter::Sub;
-			return createCompressedVector(sub);
+			//std::cout << "Filter SUB" << std::endl;
+			//currentSelectedFilter = SelectedFilter::Sub;
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, createCompressedVector(sub));
 		}
 		case 1: {
-			std::cout << "Filter UP" << std::endl;
-			currentSelectedFilter = SelectedFilter::Up;
-			return createCompressedVector(up);
+			//std::cout << "Filter UP" << std::endl;
+			//currentSelectedFilter = SelectedFilter::Up;
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Up, createCompressedVector(up));
+
 		}
 		case 2: {
-			std::cout << "Filter AVERAGE" << std::endl;
-			currentSelectedFilter = SelectedFilter::Average;
-			return createCompressedVector(average);
+			//std::cout << "Filter AVERAGE" << std::endl;
+			//currentSelectedFilter = SelectedFilter::Average;
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Average, createCompressedVector(average));
 		}
 		case 3: {
-			std::cout << "Filter PEATH" << std::endl;
-			currentSelectedFilter = SelectedFilter::Paeth;
-			return createCompressedVector(paeth);
+			//std::cout << "Filter PEATH" << std::endl;
+			//currentSelectedFilter = SelectedFilter::Paeth;
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Paeth, createCompressedVector(paeth));
 		}
 		default: {
-			std::cout << "Filter default" << std::endl;
-			currentSelectedFilter = SelectedFilter::Sub;
-			return createCompressedVector(sub);
+			//std::cout << "Načeloma nikoli ne pride sem, ampak za ziher" << std::endl;
+			//currentSelectedFilter = SelectedFilter::Sub;
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, createCompressedVector(sub));
+
 		}
 	}
 }
@@ -148,22 +150,73 @@ short PNG_filters::filterPaethDecode(short diff, short left, short up, short lef
 /// Zakodiramo celotno sliko z izbranim filtrom
 /// </summary>
 /// <returns>zakodirani podatki</returns>
-std::vector<char>* PNG_filters::Encode() {
+std::tuple<std::vector<SelectedFilter>, std::vector<char>> PNG_filters::Encode() {
 	if (!isImage()) {
-		return NULL;
+		//return NULL;
+		throw;
 	}
 	int height = image.size().height;
 	int width = image.size().width;
 
+	std::vector<SelectedFilter> selFilter;
+	std::vector<char> codes;
+
+	std::vector<short> encodedSub;
+	std::vector<short> encodedUp;
+	std::vector<short> encodedAvg;
+	std::vector<short> encodedPaeth;
+
 	if (numberOfEncodedRows != NoneRows) {
-		std::vector<short> encodedSub;
-		std::vector<short> encodedUp;
-		std::vector<short> encodedAvg;
-		std::vector<short> encodedPaeth;
+		int rowNumber = static_cast<int>(numberOfEncodedRows);
+
+		for (int u = 0; u < height; u+=rowNumber) {
+			for (int x = u; x < u + static_cast<int>(numberOfEncodedRows) && x < height; x++) {
+				for (int y = 0; y < width; y++) {
+					cv::Vec3b current = image.at<cv::Vec3b>(x, y);
+					cv::Vec3b left;
+					cv::Vec3b up;
+					cv::Vec3b leftUp;
+
+					left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
+					up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
+					leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
+
+					for (int z = 0; z < 3; z++) {
+						encodedSub.push_back(left != nullCheck ? filterSubEncode(current[z], left[z]) : current[z]);
+						encodedUp.push_back(up != nullCheck ? filterUpEncode(current[z], up[z]) : current[z]);
+						encodedAvg.push_back(left != nullCheck && up != nullCheck ? filterAverageEncode(current[z], left[z], up[z]) : current[z]);
+						encodedPaeth.push_back(left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPeathEncode(current[z], left[z], up[z], leftUp[z]) : current[z]);
+					}
+				}
+			}
 
 
-		int counter = 0;
-		for (int x = 0; x < static_cast<int>(numberOfEncodedRows) && x < height; x++, counter+=numberOfEncodedRows) {
+			SelectedFilter tmpSf;
+			std::vector<char> code;
+
+			std::tie(tmpSf, code) = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+
+			selFilter.push_back(tmpSf);
+			for (auto symbol : code) {
+				codes.push_back(symbol);
+			}
+
+			encodedSub.clear();
+			encodedUp.clear();
+			encodedAvg.clear();
+			encodedPaeth.clear();
+
+		}
+
+		//return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+
+	}
+	else {
+		//std::vector<short> encodedSub;
+		//std::vector<short> encodedUp;
+		//std::vector<short> encodedAvg;
+		//std::vector<short> encodedPaeth;
+		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < width; y++) {
 				cv::Vec3b current = image.at<cv::Vec3b>(x, y);
 				cv::Vec3b left;
@@ -183,36 +236,20 @@ std::vector<char>* PNG_filters::Encode() {
 			}
 		}
 
-		return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+		SelectedFilter tmpSf;
+		std::vector<char> code;
 
-	}
+		std::tie(tmpSf, code) = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 
-	//std::vector<Values> encodedValues;
-	std::vector<short>* encodedSub = new std::vector<short>;
-	std::vector<short>* encodedUp = new std::vector<short>;
-	std::vector<short>* encodedAvg = new std::vector<short>;
-	std::vector<short>* encodedPaeth = new std::vector<short>;
-	for (int x = 0; x < height; x++) {
-		for (int y = 0; y < width; y++) {
-			cv::Vec3b current = image.at<cv::Vec3b>(x, y);
-			cv::Vec3b left;
-			cv::Vec3b up;
-			cv::Vec3b leftUp;
-
-			left = y - 1 >= 0 ? image.at<cv::Vec3b>(x, y - 1) : NULL;
-			up = x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y) : NULL;
-			leftUp = y - 1 >= 0 && x - 1 >= 0 ? image.at<cv::Vec3b>(x - 1, y - 1) : NULL;
-
-			for (int z = 0; z < 3; z++) {
-				encodedSub->push_back(left != nullCheck ? filterSubEncode(current[z], left[z]) : current[z]);
-				encodedUp->push_back(up != nullCheck ? filterUpEncode(current[z], up[z]) : current[z]);
-				encodedAvg->push_back(left != nullCheck && up != nullCheck ? filterAverageEncode(current[z], left[z], up[z]) : current[z]);
-				encodedPaeth->push_back(left != nullCheck && leftUp != nullCheck && up != nullCheck ? filterPeathEncode(current[z], left[z], up[z], leftUp[z]) : current[z]);
-			}
+		selFilter.push_back(tmpSf);
+		for (auto symbol : code) {
+			codes.push_back(symbol);
 		}
 	}
 
-	return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
+	return std::tuple<std::vector<SelectedFilter>, std::vector<char>>(selFilter, codes);
+
+	//return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 }
 
 /// <summary>

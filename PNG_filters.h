@@ -38,9 +38,9 @@ private:
 
 	bool isImage();
 	void showImage();
-	int sumElementsInVector(std::vector<short>* v);
-	std::vector<char>* createCompressedVector(std::vector<short>* v);
-	std::vector<char>* hevristics(std::vector<short>* sub, std::vector<short>* up, std::vector<short>* average, std::vector<short>* paeth);
+	int sumElementsInVector(std::vector<short> v);
+	std::vector<char> createCompressedVector(std::vector<short> v);
+	std::tuple<SelectedFilter, std::vector<char>> hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth);
 
 	short filterNoneEncode();
 	short filterSubEncode(short  current, short  left);
@@ -60,7 +60,7 @@ public:
 	PNG_filters(std::string fileName);
 	~PNG_filters();
 
-	std::vector<char>* Encode();
+	std::tuple<std::vector<SelectedFilter>, std::vector<char>> Encode();
 	cv::Mat Decode(int width, int height, std::vector<char>* values);
 
 	cv::Size getSize();

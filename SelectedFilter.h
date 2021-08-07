@@ -5,7 +5,7 @@ enum SelectedFilter
     NoneFilter, Sub, Up, Average, Paeth
 };
 
-extern SelectedFilter currentSelectedFilter;
+//extern SelectedFilter currentSelectedFilter;
 
 //Use None for encoding whole image
 enum NumberOfEncodedRows {

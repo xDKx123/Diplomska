@@ -8,8 +8,7 @@
 /// <param name="v">znaki z njihovimi podatki</param>
 /// <param name="root">koren</param>
 /// <param name="b">binarni vektor</param>
-template<class T>
-void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b)
+void Huffman::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* root, std::vector<bool> b)
 {
 	if (!root) {
 		return;
@@ -35,8 +34,7 @@ void Huffman<T>::makeCodes(std::map<char, std::vector<bool>>& v, struct Node* ro
 /// <typeparam name="T">float - verjetnostna tabela, int - �tevilo pojavitev</typeparam>
 /// <param name="v">verjetnostna tabela / tabela, ki �teje pojavitve</param>
 /// <returns></returns>
-template<class T>
-std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, float> v)
+std::map<char, std::vector<bool>> Huffman::buildTree(std::map<char, float> v)
 {
 	std::map<char, std::vector<bool>> mp;
 
@@ -56,7 +54,7 @@ std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, float> v)
 		r = prior_q.top();
 		prior_q.pop();
 
-		top = new Node(std::make_pair<std::optional<char>, T>({}, l->p.second + r->p.second));
+		top = new Node(std::make_pair<std::optional<char>, float>({}, l->p.second + r->p.second));
 
 		top->left = l;
 		top->right = r;
@@ -78,8 +76,7 @@ std::map<char, std::vector<bool>> Huffman<T>::buildTree(std::map<char, float> v)
 /// <param name="mp">pojavitvena tabela</param>
 /// <param name="tree">zgrajeno drevo</param>
 /// <returns></returns>
-template<class T>
-std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, int size)
+std::map<char, float> Huffman::calculateProbability(std::map<char, int> mp, int size)
 {
 	std::map<char, float> cf;
 
@@ -101,19 +98,18 @@ std::map<char, float> Huffman<T>::calculateProbability(std::map<char, int> mp, i
 /// <typeparam name="T"></typeparam>
 /// <param name="v">slikovni podatki</param>
 /// <returns>tabela z binarnimi podatki znakov, verjetnostna tabela</returns>
-template<class T>
-std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>::Encode(std::vector<char>* v)
+std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::Encode(std::vector<char> v)
 {
-	std::vector<bool>* b = new std::vector<bool>;
+	std::vector<bool> b;
 
 	std::map<char, int> mp = Utility::commonDictionaryMap();
 
-	for (auto c : *v) {
+	for (auto c : v) {
 		//std::map<char, int>::iterator it = std::find(mp.begin(), mp.end(), c);
 		mp[c]++;
 	}
 
-	std::map<char, float> cf = calculateProbability(mp, v->size());
+	std::map<char, float> cf = calculateProbability(mp, v.size());
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
@@ -127,20 +123,19 @@ std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman<T>:
 /// <param name="data">binarni podatki</param>
 /// <param name="cf">verjetnostna tabela</param>
 /// <returns>slikovni podatki</returns>
-template<class T>
-std::vector<char>* Huffman<T>::Decode(std::vector<bool>* data, std::map<char, float> cf) {
-	std::vector<char>* c = new std::vector<char>;
+std::vector<char> Huffman::Decode(std::vector<bool> data, std::map<char, float> cf) {
+	std::vector<char> c;
 
 	std::map<char, std::vector<bool>> tree = buildTree(cf);
 
 	std::vector<bool> bols;
-	for (auto b : *data) {
+	for (auto b : data) {
 		bols.push_back(b);
 		
 		for (std::map<char, std::vector<bool>>::iterator it = tree.begin(); it != tree.end(); ++it) {
 			
 			if (it->second.size() == bols.size() and std::equal(it->second.begin(), it->second.end(), bols.begin())) {
-				c->push_back(it->first);
+				c.push_back(it->first);
 				bols.clear();
 				break;
 			}

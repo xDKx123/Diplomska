@@ -42,27 +42,31 @@ int main(int argc, char* argv) {
 
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
-				std::vector<char>* v = pngFilters->Encode();
+				std::vector<SelectedFilter> selectedFilter;
+				std::vector<char> data;
+				std::tie(selectedFilter, data) = pngFilters->Encode();
 				cv::Size size = pngFilters->getSize();
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-				start = std::chrono::system_clock::now();
-				auto key = townsend::algorithm::bwtEncode(v->begin(), v->end());
-				end = std::chrono::system_clock::now();
-				int index = std::distance(v->begin(), key);
-				std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				//start = std::chrono::system_clock::now();
+				//auto key = townsend::algorithm::bwtEncode(data.begin(), data.end());
+				//end = std::chrono::system_clock::now();
+				//int index = std::distance(data.begin(), key);
+				//std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+				
+				int index = 0;
 
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
-				std::vector<char>* mtfTransformed = mtf->Encode(v);
+				std::vector<char> mtfTransformed = mtf->Encode(data);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje MTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
 
-				Huffman<float>* hf = new Huffman<float>();
+				Huffman* hf = new Huffman();
 
 				start = std::chrono::system_clock::now();
 				std::map<char, std::vector<bool>> tree;
@@ -83,15 +87,10 @@ int main(int argc, char* argv) {
 				Utility::writeBinFile(size.width, size.height, index, mtfTransformed, tree, probability);
 				end = std::chrono::system_clock::now();
 				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-				v->clear();
-
+				
 
 				std::cout << "\nFile compression: " << Utility::compressionFactor(fileName, "out.bin") << std::endl;
 				
-
-				delete v;
-				delete mtf;
-				delete hf;
 			}
 			else {
 				std::cout << "Najprej nalo�ite sliko." << std::endl;
@@ -130,11 +129,11 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			auto key2 = std::next(mtfDecode->begin(), index);
-			start = std::chrono::system_clock::now();
-			townsend::algorithm::bwtDecode(mtfDecode->begin(), mtfDecode->end(), key2);
-			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			//auto key2 = std::next(mtfDecode->begin(), index);
+			//start = std::chrono::system_clock::now();
+			//townsend::algorithm::bwtDecode(mtfDecode->begin(), mtfDecode->end(), key2);
+			//end = std::chrono::system_clock::now();
+			//std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 			//std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
 

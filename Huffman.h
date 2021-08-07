@@ -6,15 +6,14 @@
 #include <queue>
 #include <optional>
 
-template<class T>
 class Huffman
 {
 private:
 	struct Node {
-		std::pair<std::optional<char>, T> p;
+		std::pair<std::optional<char>, float> p;
 		Node* left, *right;
 
-		Node(std::pair<std::optional<char>, T> pa) {
+		Node(std::pair<std::optional<char>, float> pa) {
 			p = pa;
 			left = NULL;
 			right = NULL;
@@ -35,7 +34,7 @@ private:
 	std::map<char, float> calculateProbability(std::map<char, int> mp, int size);
 
 public:
-	std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Encode(std::vector<char>* v);
-	std::vector<char>* Decode(std::vector<bool>* data, std::map<char, float> cf);
+	std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Encode(std::vector<char> v);
+	std::vector<char> Decode(std::vector<bool> data, std::map<char, float> cf);
 };
 
