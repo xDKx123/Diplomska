@@ -91,6 +91,7 @@ int main(int argc, char* argv) {
 
 				std::cout << "\nFile compression: " << Utility::compressionFactor(fileName, "out.bin") << std::endl;
 				
+				delete huffman;
 				delete mtf;
 				//delete hf;
 			}
@@ -122,6 +123,7 @@ int main(int argc, char* argv) {
 			end = std::chrono::system_clock::now();
 			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+			std::cout << "Chars: " << chars.size() << std::endl;
 
 			//std::cout << "data: " << chars->size() << std::endl;
 
