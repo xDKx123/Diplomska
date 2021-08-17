@@ -23,9 +23,11 @@ int main(int argc, char* argv) {
 	bool running = true;
 	PNG_filters *pngFilters = NULL;
 
+	const int errorCorrection = 0;
+
 	//pngFilters->showImage();
 
-	std::string fileName = "testing.bmp";
+	std::string fileName;
 
 	while (running) {
 		switch (Utility::menu()) {
@@ -42,20 +44,25 @@ int main(int argc, char* argv) {
 			if (pngFilters) {
 				auto start = std::chrono::system_clock::now();
 				std::vector<SelectedFilter> selectedFilter;
-				std::vector<char> data;
+				std::vector<short> data;
 				std::tie(selectedFilter, data) = pngFilters->Encode();
 				cv::Size size = pngFilters->getSize();
 				auto end = std::chrono::system_clock::now();
 				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+				//Correction for near-lossless
+				for (int x = 0; x < data.size(); x++) {
+					if (data[x] < errorCorrection) {
+						data[x] = 0;
+					}
+				}
 
-				//start = std::chrono::system_clock::now();
-				//auto key = townsend::algorithm::bwtEncode(data.begin(), data.end());
-				//end = std::chrono::system_clock::now();
-				//int index = std::distance(data.begin(), key);
-				//std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-				
-				int index = 0;
+
+				start = std::chrono::system_clock::now();
+				auto key = townsend::algorithm::bwtEncode(data.begin(), data.end());
+				end = std::chrono::system_clock::now();
+				int index = std::distance(data.begin(), key);
+				std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 				MTF* mtf = new MTF();
 				start = std::chrono::system_clock::now();
@@ -134,11 +141,11 @@ int main(int argc, char* argv) {
 			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 
-			//auto key2 = std::next(mtfDecode->begin(), index);
-			//start = std::chrono::system_clock::now();
-			//townsend::algorithm::bwtDecode(mtfDecode->begin(), mtfDecode->end(), key2);
-			//end = std::chrono::system_clock::now();
-			//std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			auto key2 = std::next(mtfDecode.begin(), index);
+			start = std::chrono::system_clock::now();
+			townsend::algorithm::bwtDecode(mtfDecode.begin(), mtfDecode.end(), key2);
+			end = std::chrono::system_clock::now();
+			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 			//std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
 

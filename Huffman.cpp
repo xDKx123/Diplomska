@@ -99,7 +99,7 @@ std::map<char, float> Huffman::calculateProbability(std::map<char, int> mp, int 
 /// <returns>tabela z binarnimi podatki znakov, verjetnostna tabela</returns>
 std::tuple<std::map<char, std::vector<bool>>, std::map<char, float>> Huffman::Encode(std::vector<char> v)
 {
-	std::vector<bool> b;
+	//std::vector<bool> b;
 
 	std::map<char, int> mp = Utility::commonDictionaryMap();
 

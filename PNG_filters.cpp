@@ -39,7 +39,7 @@ std::vector<char> PNG_filters::createCompressedVector(std::vector<short> v)
 /// <param name="average"></param>
 /// <param name="paeth"></param>
 /// <returns></returns>
-std::tuple<SelectedFilter, std::vector<char>> PNG_filters::hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth)
+std::tuple<SelectedFilter, std::vector<short>> PNG_filters::hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth)
 {
 	std::vector<int> sums;
 	sums.push_back(sumElementsInVector(sub));
@@ -51,28 +51,28 @@ std::tuple<SelectedFilter, std::vector<char>> PNG_filters::hevristics(std::vecto
 		case 0: {
 			//std::cout << "Filter SUB" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Sub;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, createCompressedVector(sub));
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, sub);
 		}
 		case 1: {
 			//std::cout << "Filter UP" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Up;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Up, createCompressedVector(up));
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Up, up);
 
 		}
 		case 2: {
 			//std::cout << "Filter AVERAGE" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Average;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Average, createCompressedVector(average));
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Average, average);
 		}
 		case 3: {
 			//std::cout << "Filter PEATH" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Paeth;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Paeth, createCompressedVector(paeth));
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Paeth, paeth);
 		}
 		default: {
 			//std::cout << "Načeloma nikoli ne pride sem, ampak za ziher" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Sub;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, createCompressedVector(sub));
+			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, sub);
 
 		}
 	}
@@ -150,7 +150,7 @@ short PNG_filters::filterPaethDecode(short diff, short left, short up, short lef
 /// Zakodiramo celotno sliko z izbranim filtrom
 /// </summary>
 /// <returns>zakodirani podatki</returns>
-std::tuple<std::vector<SelectedFilter>, std::vector<char>> PNG_filters::Encode() {
+std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode() {
 	if (!isImage()) {
 		//return NULL;
 		throw;

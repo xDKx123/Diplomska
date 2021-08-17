@@ -5,7 +5,7 @@
 /// </summary>
 /// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
-		return "testing.bmp";
+		return "images/random2.bmp";
 }
 
 /// <summary>

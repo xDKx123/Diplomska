@@ -40,7 +40,7 @@ private:
 	void showImage();
 	int sumElementsInVector(std::vector<short> v);
 	std::vector<char> createCompressedVector(std::vector<short> v);
-	std::tuple<SelectedFilter, std::vector<char>> hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth);
+	std::tuple<SelectedFilter, std::vector<short>> hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth);
 
 	short filterNoneEncode();
 	short filterSubEncode(short  current, short  left);
@@ -60,7 +60,7 @@ public:
 	PNG_filters(std::string fileName);
 	~PNG_filters();
 
-	std::tuple<std::vector<SelectedFilter>, std::vector<char>> Encode();
+	std::tuple<std::vector<SelectedFilter>, std::vector<short>> Encode();
 	cv::Mat Decode(int width, int height, std::vector<SelectedFilter> selectedFilter, std::vector<char> values);
 
 	cv::Size getSize();
