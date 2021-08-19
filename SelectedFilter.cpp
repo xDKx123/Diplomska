@@ -2,4 +2,4 @@
 
 //SelectedFilter currentSelectedFilter = SelectedFilter::NoneFilter;
 
-NumberOfEncodedRows numberOfEncodedRows = NoneRows;
+//NumberOfEncodedRows numberOfEncodedRows = NoneRows;

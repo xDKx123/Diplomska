@@ -51,28 +51,28 @@ std::tuple<SelectedFilter, std::vector<short>> PNG_filters::hevristics(std::vect
 		case 0: {
 			//std::cout << "Filter SUB" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Sub;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, sub);
+			return std::tuple<SelectedFilter, std::vector<short>>(SelectedFilter::Sub, sub);
 		}
 		case 1: {
 			//std::cout << "Filter UP" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Up;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Up, up);
+			return std::tuple<SelectedFilter, std::vector<short>>(SelectedFilter::Up, up);
 
 		}
 		case 2: {
 			//std::cout << "Filter AVERAGE" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Average;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Average, average);
+			return std::tuple<SelectedFilter, std::vector<short>>(SelectedFilter::Average, average);
 		}
 		case 3: {
 			//std::cout << "Filter PEATH" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Paeth;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Paeth, paeth);
+			return std::tuple<SelectedFilter, std::vector<short>>(SelectedFilter::Paeth, paeth);
 		}
 		default: {
 			//std::cout << "Načeloma nikoli ne pride sem, ampak za ziher" << std::endl;
 			//currentSelectedFilter = SelectedFilter::Sub;
-			return std::tuple<SelectedFilter, std::vector<char>>(SelectedFilter::Sub, sub);
+			return std::tuple<SelectedFilter, std::vector<short>>(SelectedFilter::Sub, sub);
 
 		}
 	}
@@ -159,18 +159,18 @@ std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode(
 	int width = image.size().width;
 
 	std::vector<SelectedFilter> selFilter;
-	std::vector<char> codes;
+	std::vector<short> codes;
 
 	std::vector<short> encodedSub;
 	std::vector<short> encodedUp;
 	std::vector<short> encodedAvg;
 	std::vector<short> encodedPaeth;
 
-	if (numberOfEncodedRows != NoneRows) {
-		int rowNumber = static_cast<int>(numberOfEncodedRows);
+	/*if (numberOfEncodedRows != NoneRows) {*/
+		//int rowNumber = static_cast<int>(numberOfEncodedRows);
 
-		for (int u = 0; u < height; u+=rowNumber) {
-			for (int x = u; x < u + static_cast<int>(numberOfEncodedRows) && x < height; x++) {
+		for (int u = 0; u < height; u++) {
+			for (int x = u; x < u + 1 && x < height; x++) {
 				for (int y = 0; y < width; y++) {
 					cv::Vec3b current = image.at<cv::Vec3b>(x, y);
 					cv::Vec3b left;
@@ -192,7 +192,7 @@ std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode(
 
 
 			SelectedFilter tmpSf;
-			std::vector<char> code;
+			std::vector<short> code;
 
 			std::tie(tmpSf, code) = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 
@@ -210,7 +210,7 @@ std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode(
 
 		//return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 
-	}
+	/*}
 	else {
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < width; y++) {
@@ -233,7 +233,7 @@ std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode(
 		}
 
 		SelectedFilter tmpSf;
-		std::vector<char> code;
+		std::vector<short> code;
 
 		std::tie(tmpSf, code) = hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 
@@ -241,9 +241,9 @@ std::tuple<std::vector<SelectedFilter>, std::vector<short>> PNG_filters::Encode(
 		for (auto symbol : code) {
 			codes.push_back(symbol);
 		}
-	}
+	}*/
 
-	return std::tuple<std::vector<SelectedFilter>, std::vector<char>>(selFilter, codes);
+	return std::tuple<std::vector<SelectedFilter>, std::vector<short>>(selFilter, codes);
 
 	//return hevristics(encodedSub, encodedUp, encodedAvg, encodedPaeth);
 }
@@ -271,10 +271,10 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<SelectedFilter> s
 	
 	image = cv::Mat(cv::Size(width, height), CV_8UC3);
 
-	if (numberOfEncodedRows != NoneRows) {
+	//if (numberOfEncodedRows != NoneRows) {
 		int heightIndex = 0;
-		for (int u = 0; u < selectedFilter.size(); u++, heightIndex += static_cast<int>(numberOfEncodedRows)) {
-			for (int x = heightIndex; x < height && x < heightIndex + static_cast<int>(numberOfEncodedRows); x++) {
+		for (int u = 0; u < selectedFilter.size(); u++, heightIndex ++) {
+			for (int x = heightIndex; x < height && x < heightIndex + 1; x++) {
 				for (int y = 0; y < width; y++) {
 					cv::Vec3b current;
 					cv::Vec3b left;
@@ -304,7 +304,7 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<SelectedFilter> s
 				}
 			}
 		}
-	}
+	/*}
 	else {
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < width; y++) {
@@ -336,7 +336,7 @@ cv::Mat PNG_filters::Decode(int width, int height, std::vector<SelectedFilter> s
 				image.at<cv::Vec3b>(x, y) = current;
 			}
 		}
-	}
+	}*/
 
 	return image;
 }

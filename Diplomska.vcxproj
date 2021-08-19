@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="BinReader.cpp" />
     <ClCompile Include="BinWriter.cpp" />
+    <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Huffman.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MTF.cpp" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="BinReader.h" />
     <ClInclude Include="BinWriter.h" />
+    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Huffman.h" />
     <ClInclude Include="MTF.h" />
     <ClInclude Include="PNG_filters.h" />

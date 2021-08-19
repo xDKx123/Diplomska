@@ -5,7 +5,7 @@
 /// </summary>
 /// <returns>string - ime dokumenta</returns>
 std::string Utility::getImage() {
-		return "images/random2.bmp";
+		return "testing.bmp";
 }
 
 /// <summary>
@@ -51,6 +51,7 @@ int Utility::menu() {
 	std::cout << "1) Naloži dokument" << std::endl;
 	std::cout << "2) Poženi kodiranje" << std::endl;
 	std::cout << "3) Poženi dekodiranje" << std::endl;
+	std::cout << "\n9) Testing" << std::endl;
 	//std::cout << "4) Resize image" << std::endl;
 
 	// std::cout << "\nTestiranje" << std::endl;
@@ -122,10 +123,10 @@ double Utility::compressionFactor(std::string originalFile, std::string compress
 /// <param name="items">slikovni podatki</param>
 /// <param name="encodedValues">binarni podatki posameznega znaka</param>
 /// <param name="probability">verjetnostna tabela</param>
-void Utility::writeBinFile(int width, int height, int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability)
+void Utility::writeBinFile(int width, int height, int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability, std::string fileName)
 {
 	//dodaj zapise za glavo
-	std::string fileName = "out" + validEncryptedFileExtension;
+	//std::string fileName = "out" + validEncryptedFileExtension;
 	BinWriter* binWriter = new BinWriter(fileName);
 
 	binWriter->writeShort(width);
@@ -196,10 +197,10 @@ void Utility::writeBinFile(int width, int height, int index, std::vector<Selecte
 /// Ustvari bmp sliko
 /// </summary>
 /// <param name="image">slika, ki jo �elimo zapisati na disk</param>
-void Utility::writeBmpFile(cv::Mat image)
+void Utility::writeBmpFile(cv::Mat image, std::string fileName)
 {
 	//std::string fileName = randomName() + validImageFileExtension;
-	std::string fileName = "out" + validImageFileExtension;
+	//std::string fileName = "out" + validImageFileExtension;
 
 	try {
 		cv::imwrite(fileName, image);
@@ -214,11 +215,11 @@ void Utility::writeBmpFile(cv::Mat image)
 /// Branje binarne datoteke
 /// </summary>
 /// <returns>�irina, vi�ina, verjetnostna tabela, slikovni podatki</returns>
-std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> Utility::readBinFile()
+std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> Utility::readBinFile(std::string fileName)
 {
 	//NE DIRAJ KER DELA
 	//std::string fileName = getImage();
-	std::string fileName = "out.bin";
+	//std::string fileName = "out.bin";
 	BinReader* binReader = new BinReader(fileName);
 
 	for (int x = 0; x < 8; x++) {
@@ -243,7 +244,7 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 
 	std::vector<SelectedFilter> selectedFilter;
 
-	if (numberOfEncodedRows == NoneRows) {
+	/*if (numberOfEncodedRows == NoneRows) {
 		std::vector<bool> selFilter;
 		for (int y = 0; y < 2; y++) {
 			bool b = binReader->readBit();
@@ -263,9 +264,9 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 			selectedFilter.push_back(Paeth);
 		}
 	}
-	else {
+	else {*/
 		//for (int x = 0; x < static_cast<int>(std::ceil(static_cast<float>(width) / static_cast<int>(numberOfEncodedRows))); x++) {
-		for (int x = 0; x < height; x += static_cast<int>(numberOfEncodedRows)) {
+		for (int x = 0; x < height; x++) {
 			std::vector<bool> selFilter;
 			for (int y = 0; y < 2; y++) {
 				bool b = binReader->readBit();
@@ -287,7 +288,7 @@ std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::m
 			selFilter.clear();
 		}
 
-	}
+	//}
 	/*bool b1 = binReader->readBit();
 	bool b2 = binReader->readBit();
 
@@ -338,7 +339,7 @@ void Utility::resizeImage(std::string fileName)
 std::vector<bool> Utility::writeSelectedNumberOfRowsData() {
 	std::vector<bool> v;
 
-	switch (numberOfEncodedRows) {
+	/*switch (numberOfEncodedRows) {
 		case NoneRows:
 			v.push_back(false);
 			v.push_back(false);
@@ -405,12 +406,14 @@ std::vector<bool> Utility::writeSelectedNumberOfRowsData() {
 			v.push_back(true);
 			v.push_back(false);
 			break;
-	}
+	}*/
+
+	return v;
 }
 
 
 void Utility::writeSelectedNumberOfRowsData(std::vector<bool> b) {
-	if (b[0] == false && b[1] == false && b[2] == false && b[3] == false) {
+	/*if (b[0] == false && b[1] == false && b[2] == false && b[3] == false) {
 		numberOfEncodedRows = NoneRows;
 	}
 	else if (b[0] == false && b[1] == false && b[2] == false && b[3] == true) {
@@ -442,5 +445,92 @@ void Utility::writeSelectedNumberOfRowsData(std::vector<bool> b) {
 	}
 		else if (b[0] == true && b[1] == false && b[2] == true && b[3] == false) {
 		numberOfEncodedRows = Ten;
+	}*/
+}
+
+double Utility::SSIM(std::string originalPath, std::string decompressedPath)
+{
+	const double k1 = 0.01;
+	const double k2 = 0.03;
+
+	cv::Mat original = cv::imread(originalPath);
+	cv::Mat decompressed =  cv::imread(decompressedPath);
+
+
+	//cv::Mat originalYCrCb;
+	//cv::Mat decompressedYCrCb;
+	//cv::cvtColor(original, originalYCrCb, cv::COLOR_RGB2YCrCb);
+	//cv::cvtColor(decompressed, decompressedYCrCb, cv::COLOR_RGB2YCrCb);
+
+	
+
+	double qx = averagePixel(original);
+	double qy = averagePixel(decompressed);
+
+	double ox = variance(original, qx);
+	double oy = variance(decompressed, qy);
+
+	double oxy = covariance(original, qx, decompressed, qy);
+
+	double c1 = dynamicRange(k1);
+	double c2 = dynamicRange(k2);
+
+	return ((2*qx*qy + c1)*(2*oxy + c2)) / ((pow(qx,2) + pow(qy,2) + c1)*(pow(ox,2) + pow(oy,2) + c2));
+}
+
+double Utility::averagePixel(cv::Mat image) {
+	cv::Size imageSize = image.size();
+
+	int counter = 0;
+	for (int x = 0; x < imageSize.width; x++) {
+		for (int y = 0; y < imageSize.height; y++) {
+			cv::Vec3b pixel = image.at<cv::Vec3b>(x, y);
+
+			for (int z = 0; z < 3; z++) {
+				counter += pixel[z];
+			}
+		}
 	}
+
+	return static_cast<double>(counter) / (static_cast<double>(imageSize.width * imageSize.height));
+}
+
+double Utility::dynamicRange(double k) {
+	int L = pow(2, 24) - 1;
+	return pow(k * L,2);
+}
+
+double Utility::variance(cv::Mat image, double average) {
+	cv::Size imageSize = image.size();
+
+	double counter = 0.0;
+	for (int x = 0; x < imageSize.width; x++) {
+		for (int y = 0; y < imageSize.height; y++) {
+			cv::Vec3b pixel = image.at<cv::Vec3b>(x, y);
+
+			for (int z = 0; z < 3; z++) {
+				counter += (pixel[z] - average);
+			}
+		}
+	}
+
+	return pow(counter, 0.5);
+}
+
+double Utility::covariance(cv::Mat original, double averageOriginal, cv::Mat decompressed, double averageDecompressed) {
+	cv::Size imageSize = original.size();
+
+	double counter = 0.0;
+	for (int x = 0; x < imageSize.width; x++) {
+		for (int y = 0; y < imageSize.height; y++) {
+			cv::Vec3b pixelOriginal = original.at<cv::Vec3b>(x, y);
+			cv::Vec3b pixelDecompressed = decompressed.at<cv::Vec3b>(x, y);
+
+			for (int z = 0; z < 3; z++) {
+				counter += ((pixelOriginal[z] - averageOriginal) * (pixelDecompressed[z] - averageDecompressed));
+			}
+		}
+	}
+
+	return counter;
 }

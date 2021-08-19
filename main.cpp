@@ -6,6 +6,7 @@
 #include <chrono>
 #include <list>
 
+#include "Configuration.h"
 #include "PNG_filters.h"
 #include "Utility.h"
 #include "MTF.h"
@@ -18,12 +19,142 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+
+void encode(Configuration* configuration) {
+	//fileName = Utility::getImage();
+	PNG_filters* pngFilters = new PNG_filters(configuration->getInput());
+
+
+	if (pngFilters) {
+		auto start = std::chrono::system_clock::now();
+		std::vector<SelectedFilter> selectedFilter;
+		std::vector<short> data;
+		std::tie(selectedFilter, data) = pngFilters->Encode();
+		cv::Size size = pngFilters->getSize();
+		auto end = std::chrono::system_clock::now();
+		std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+		//Correction for near-lossless
+
+		std::vector<char> charData;
+		for (int x = 0; x < data.size(); x++) {
+			if (data[x] <= configuration->getErrorCorrection() && data[x] >= -configuration->getErrorCorrection()) {
+				data[x] = 0;
+			}
+			charData.push_back(static_cast<char>(data[x]));
+		}
+
+
+		//start = std::chrono::system_clock::now();
+		//auto key = townsend::algorithm::bwtEncode(data.begin(), data.end());
+		//end = std::chrono::system_clock::now();
+		//int index = std::distance(data.begin(), key);
+		//std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+		int index = 0;
+
+
+		MTF* mtf = new MTF();
+		start = std::chrono::system_clock::now();
+		std::vector<char> mtfTransformed = mtf->Encode(charData);
+		end = std::chrono::system_clock::now();
+		std::cout << "Trajanje MTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+
+		Huffman* huffman = new Huffman();
+
+		start = std::chrono::system_clock::now();
+		std::map<char, std::vector<bool>> tree;
+		std::map<char, float> probability;
+		std::tie(tree, probability) = huffman->Encode(mtfTransformed);
+		end = std::chrono::system_clock::now();
+		std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+		// std::cout << "--------------DEBUG INFO--------------" << std::endl;
+		// for (auto it : probability)  {
+		// 	std::cout << it.first << "\t" << it.second << std::endl; 
+		// }
+		// std::cout << "--------------DEBUG INFO--------------" << std::endl;
+
+
+		start = std::chrono::system_clock::now();
+		Utility::writeBinFile(size.width, size.height, index, selectedFilter, mtfTransformed, tree, probability, configuration->getOutput());
+		end = std::chrono::system_clock::now();
+		std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+
+		//std::cout << "\nFile compression: " << Utility::compressionFactor(configuration->getInput(), "out.bin") << std::endl;
+
+		delete huffman;
+		delete mtf;
+		//delete hf;
+	}
+	else {
+		std::cout << "Najprej nalo�ite sliko." << std::endl;
+	}
+}
+
+void decode(Configuration* configuration) {
+	int width, height, index;
+	std::vector<bool> data;
+	std::map<char, float> probability;
+	std::vector<SelectedFilter> selectedFilter;
+
+	auto start = std::chrono::system_clock::now();
+	std::tie(width, height, index, selectedFilter, data, probability) = Utility::readBinFile(configuration->getInput());
+	auto end = std::chrono::system_clock::now();
+	std::cout << "Trajanje branja binarne datoteke: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+	//std::cout << "data: " << data->size() << std::endl;
+
+	Huffman* huffman = new Huffman();
+
+	start = std::chrono::system_clock::now();
+	std::vector<char> chars = huffman->Decode(data, probability);
+	end = std::chrono::system_clock::now();
+	std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+	std::cout << "Chars: " << chars.size() << std::endl;
+
+	//std::cout << "data: " << chars->size() << std::endl;
+
+	MTF* mtf = new MTF();
+	start = std::chrono::system_clock::now();
+	std::vector<char> mtfDecode = mtf->Decode(chars);
+	end = std::chrono::system_clock::now();
+	std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+	//auto key2 = std::next(mtfDecode.begin(), index);
+	//start = std::chrono::system_clock::now();
+	//townsend::algorithm::bwtDecode(mtfDecode.begin(), mtfDecode.end(), key2);
+	//end = std::chrono::system_clock::now();
+	//std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+
+
+	PNG_filters* png = new PNG_filters();
+
+	start = std::chrono::system_clock::now();
+	cv::Mat image = png->Decode(width, height, selectedFilter, mtfDecode);
+	end = std::chrono::system_clock::now();
+	std::cout << "Trajanje PNG dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+	Utility::writeBmpFile(image, configuration->getOutput());
+
+	delete huffman;
+	delete mtf;
+	delete png;
+}
+
 int main(int argc, char* argv) {
 	setlocale(LC_ALL, "slovenian");
 	bool running = true;
 	PNG_filters *pngFilters = NULL;
 
-	const int errorCorrection = 0;
+	const int errorCorrection = 1;
 
 	//pngFilters->showImage();
 
@@ -40,126 +171,18 @@ int main(int argc, char* argv) {
 
 		case 2: {
 			//numberOfEncodedRows = NoneRows;
+			Configuration* config = new Configuration( 0, "testing.bmp", "out.bin");
+			encode(config);
+			delete config;
 
-			if (pngFilters) {
-				auto start = std::chrono::system_clock::now();
-				std::vector<SelectedFilter> selectedFilter;
-				std::vector<short> data;
-				std::tie(selectedFilter, data) = pngFilters->Encode();
-				cv::Size size = pngFilters->getSize();
-				auto end = std::chrono::system_clock::now();
-				std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-				//Correction for near-lossless
-				for (int x = 0; x < data.size(); x++) {
-					if (data[x] < errorCorrection) {
-						data[x] = 0;
-					}
-				}
-
-
-				start = std::chrono::system_clock::now();
-				auto key = townsend::algorithm::bwtEncode(data.begin(), data.end());
-				end = std::chrono::system_clock::now();
-				int index = std::distance(data.begin(), key);
-				std::cout << "Trajanje BWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-				MTF* mtf = new MTF();
-				start = std::chrono::system_clock::now();
-				std::vector<char> mtfTransformed = mtf->Encode(data);
-				end = std::chrono::system_clock::now();
-				std::cout << "Trajanje MTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
-
-				Huffman* huffman = new Huffman();
-
-				start = std::chrono::system_clock::now();
-				std::map<char, std::vector<bool>> tree;
-				std::map<char, float> probability;
-				std::tie(tree, probability) = huffman->Encode(mtfTransformed);
-				end = std::chrono::system_clock::now();
-				std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
-				// std::cout << "--------------DEBUG INFO--------------" << std::endl;
-				// for (auto it : probability)  {
-				// 	std::cout << it.first << "\t" << it.second << std::endl; 
-				// }
-				// std::cout << "--------------DEBUG INFO--------------" << std::endl;
-
-
-				start = std::chrono::system_clock::now();
-				Utility::writeBinFile(size.width, size.height, index, selectedFilter, mtfTransformed, tree, probability);
-				end = std::chrono::system_clock::now();
-				std::cout << "Trajanje zapisovanja v bin datoteko: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-				
-				
-
-				std::cout << "\nFile compression: " << Utility::compressionFactor(fileName, "out.bin") << std::endl;
-				
-				delete huffman;
-				delete mtf;
-				//delete hf;
-			}
-			else {
-				std::cout << "Najprej nalo�ite sliko." << std::endl;
-			}
 			break;
 		}
 
 
 		case 3: {
-			int width, height, index;
-			std::vector<bool> data;
-			std::map<char, float> probability;
-			std::vector<SelectedFilter> selectedFilter;
-
-			auto start = std::chrono::system_clock::now();
-			std::tie(width, height, index, selectedFilter, data, probability) = Utility::readBinFile();
-			auto end = std::chrono::system_clock::now();
-			std::cout << "Trajanje branja binarne datoteke: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
-			//std::cout << "data: " << data->size() << std::endl;
-
-			Huffman* huffman = new Huffman();
-
-			start = std::chrono::system_clock::now();
-			std::vector<char> chars = huffman->Decode(data, probability);
-			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-			std::cout << "Chars: " << chars.size() << std::endl;
-
-			//std::cout << "data: " << chars->size() << std::endl;
-
-			MTF* mtf = new MTF();
-			start = std::chrono::system_clock::now();
-			std::vector<char> mtfDecode = mtf->Decode(chars);
-			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-
-			auto key2 = std::next(mtfDecode.begin(), index);
-			start = std::chrono::system_clock::now();
-			townsend::algorithm::bwtDecode(mtfDecode.begin(), mtfDecode.end(), key2);
-			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-
-			//std::cout << width << " " << height << " " << mtfDecode->size() << std::endl;
-
-			PNG_filters* png = new PNG_filters();
-
-			start = std::chrono::system_clock::now();
-			cv::Mat image = png->Decode(width, height, selectedFilter, mtfDecode);
-			end = std::chrono::system_clock::now();
-			std::cout << "Trajanje PNG dekodiranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
-			Utility::writeBmpFile(image);
-
-			delete huffman;
-			delete mtf;
-			delete png;
+			Configuration* config = new Configuration(0, "out.bin", "out.bmp");
+			decode(config);
+			delete config;
 			break;
 		}
 
@@ -171,12 +194,41 @@ int main(int argc, char* argv) {
 		// 	  break;
 
 		case 9: {
-			std::string file1 = Utility::getImage();
-			std::string file2 = Utility::getImage();
+			std::vector<std::string> images;
+			images.push_back("cartton2");
+			images.push_back("greyscale1");
+			images.push_back("greyscale2");
+			images.push_back("random1");
+			images.push_back("random2");
 
-			std::cout << "\nFile compression: " << Utility::compressionFactor(file1, file2) << std::endl;
+			std::vector<int> errorCorrections;
+			errorCorrections.push_back(0);
+			errorCorrections.push_back(1);
+			errorCorrections.push_back(2);
+			errorCorrections.push_back(5);
+			errorCorrections.push_back(10);
+			errorCorrections.push_back(15);
 
+			const std::string prefix = "/images";
+			
+			for (auto x : images) {
+				for (auto y : errorCorrections) {
+					std::string outFile = prefix + x + "_c" + std::to_string(y) + ".bin";
+					Configuration* configuration = new Configuration(y, x + ".bmp", outFile);
+					encode(configuration);
+					delete configuration;
+
+					configuration = new Configuration(y, outFile, x + "_d" + std::to_string(y) + ".bmp");
+					decode(configuration);
+					delete configuration;
+
+				}
+			}
 			break;
+		}
+
+		case 8: {
+			std::cout << "SSIM\t" << Utility::SSIM("testing.bmp", "testing.bmp");
 		}
 
 		//case 90: {

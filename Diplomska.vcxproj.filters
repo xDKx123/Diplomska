@@ -39,6 +39,9 @@
     <ClCompile Include="SelectedFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="images\sample_1280×853.bmp">
@@ -65,6 +68,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SelectedFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

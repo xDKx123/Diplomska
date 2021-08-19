@@ -27,6 +27,10 @@
 class Utility
 {
 private:
+	static double averagePixel(cv::Mat image);
+	static double dynamicRange(double k);
+	static double variance(cv::Mat image, double average);
+	static double covariance(cv::Mat original, double averageOriginal, cv::Mat decompressed, double averageDecompressed);
 public:
 	inline static const std::string validImageFileExtension = ".bmp";
 	inline static const std::string validEncryptedFileExtension = ".bin";
@@ -40,13 +44,15 @@ public:
 	static std::map<char, int> commonDictionaryMap();
 
 	static double compressionFactor(std::string originalFile, std::string compressedFile);
-	static void writeBinFile(int width, int height,int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability);
-	static void writeBmpFile(cv::Mat image);
-	static std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> readBinFile();
+	static void writeBinFile(int width, int height,int index, std::vector<SelectedFilter> selectedFilter, std::vector<char> items, std::map<char, std::vector<bool>> encodedValues, std::map<char, float> probability, std::string fileName);
+	static void writeBmpFile(cv::Mat image, std::string fileName);
+	static std::tuple<int, int, int, std::vector<SelectedFilter>, std::vector<bool>, std::map<char, float>> readBinFile(std::string fileName);
 
 	static void resizeImage(std::string fileName);
 
 	static std::vector<bool> writeSelectedNumberOfRowsData();
 	static void writeSelectedNumberOfRowsData(std::vector<bool> b);
+
+	static double SSIM(std::string originalPath, std::string decompressedPath);
 };
 
