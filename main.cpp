@@ -19,6 +19,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+std::vector<short> first;
+std::vector<short> second;
 
 void encode(Configuration* configuration) {
 	//fileName = Utility::getImage();
@@ -29,20 +31,29 @@ void encode(Configuration* configuration) {
 		auto start = std::chrono::system_clock::now();
 		std::vector<SelectedFilter> selectedFilter;
 		std::vector<short> data;
-		std::tie(selectedFilter, data) = pngFilters->Encode();
+		std::tie(selectedFilter, data) = pngFilters->Encode(configuration);
 		cv::Size size = pngFilters->getSize();
 		auto end = std::chrono::system_clock::now();
 		std::cout << "Trajanje filtriranja: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
 		//Correction for near-lossless
 
-		std::vector<char> charData;
+		std::vector<unsigned char> charData;
 		for (int x = 0; x < data.size(); x++) {
-			if (data[x] <= configuration->getErrorCorrection() && data[x] >= -configuration->getErrorCorrection()) {
-				data[x] = 0;
-			}
-			charData.push_back(static_cast<char>(data[x]));
+			//if (data[x] < 0) {
+			//	data[x] += 256;
+			//}
+			//if (data[x] == 1 ||data[x] == -1) {
+			//	data[x] = 0;
+			//}
+			//if (data[x] == 254) {
+			//	data[x] = 255;
+			//}
+			charData.push_back(static_cast<unsigned char>(data[x]));
+			//first.push_back((data[x]));
 		}
+
+
 
 
 		//start = std::chrono::system_clock::now();
@@ -55,7 +66,7 @@ void encode(Configuration* configuration) {
 
 		MTF* mtf = new MTF();
 		start = std::chrono::system_clock::now();
-		std::vector<char> mtfTransformed = mtf->Encode(charData);
+		std::vector<unsigned char> mtfTransformed = mtf->Encode(charData);
 		end = std::chrono::system_clock::now();
 		std::cout << "Trajanje MTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -64,8 +75,8 @@ void encode(Configuration* configuration) {
 		Huffman* huffman = new Huffman();
 
 		start = std::chrono::system_clock::now();
-		std::map<char, std::vector<bool>> tree;
-		std::map<char, float> probability;
+		std::map<unsigned char, std::vector<bool>> tree;
+		std::map<unsigned char, float> probability;
 		std::tie(tree, probability) = huffman->Encode(mtfTransformed);
 		end = std::chrono::system_clock::now();
 		std::cout << "Trajanje Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
@@ -99,7 +110,7 @@ void encode(Configuration* configuration) {
 void decode(Configuration* configuration) {
 	int width, height, index;
 	std::vector<bool> data;
-	std::map<char, float> probability;
+	std::map<unsigned char, float> probability;
 	std::vector<SelectedFilter> selectedFilter;
 
 	auto start = std::chrono::system_clock::now();
@@ -113,7 +124,7 @@ void decode(Configuration* configuration) {
 	Huffman* huffman = new Huffman();
 
 	start = std::chrono::system_clock::now();
-	std::vector<char> chars = huffman->Decode(data, probability);
+	std::vector<unsigned char> chars = huffman->Decode(data, probability);
 	end = std::chrono::system_clock::now();
 	std::cout << "Trajanje dekodiranja Huffman: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -123,7 +134,7 @@ void decode(Configuration* configuration) {
 
 	MTF* mtf = new MTF();
 	start = std::chrono::system_clock::now();
-	std::vector<char> mtfDecode = mtf->Decode(chars);
+	std::vector<unsigned char> mtfDecode = mtf->Decode(chars);
 	end = std::chrono::system_clock::now();
 	std::cout << "Trajanje iMTF: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
@@ -134,6 +145,17 @@ void decode(Configuration* configuration) {
 	//end = std::chrono::system_clock::now();
 	//std::cout << "Trajanje iBWT: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 
+	//second = mtfDecode;
+	for (auto el : mtfDecode) {
+		short sh = static_cast<short>(el);
+		second.push_back(sh);
+	}
+
+	for (int x = 0; x < first.size(); x++) {
+		if (first[x] != second[x]) {
+			std::cout << "Napaka index: " << x << "\t vrednosti: " << first[x] << " " << second[x] << std::endl;
+		}
+	}
 
 
 	PNG_filters* png = new PNG_filters();
@@ -171,7 +193,7 @@ int main(int argc, char* argv) {
 
 		case 2: {
 			//numberOfEncodedRows = NoneRows;
-			Configuration* config = new Configuration( 0, "testing.bmp", "out.bin");
+			Configuration* config = new Configuration( 5, "images/greyscale2.bmp", "out.bin");
 			encode(config);
 			delete config;
 
@@ -180,7 +202,7 @@ int main(int argc, char* argv) {
 
 
 		case 3: {
-			Configuration* config = new Configuration(0, "out.bin", "out.bmp");
+			Configuration* config = new Configuration( 5, "out.bin", "out.bmp");
 			decode(config);
 			delete config;
 			break;
@@ -211,7 +233,7 @@ int main(int argc, char* argv) {
 
 			const std::string prefix = "/images";
 			
-			for (auto x : images) {
+			for (auto &x : images) {
 				for (auto y : errorCorrections) {
 					std::string outFile = prefix + x + "_c" + std::to_string(y) + ".bin";
 					Configuration* configuration = new Configuration(y, x + ".bmp", outFile);
@@ -227,10 +249,58 @@ int main(int argc, char* argv) {
 			break;
 		}
 
-		case 8: {
-			std::cout << "SSIM\t" << Utility::SSIM("testing.bmp", "testing.bmp");
+		case 5: {
+			const unsigned short maxError = 10;
+			
+			cv::Mat image = cv::imread("images/greyscale2.bmp");
+
+			int height = image.size().height;
+			int width = image.size().width;
+
+			//cv::Mat newImage = cv::Mat(cv::Size(width, height), CV_8UC3);
+			for (int x = 1; x < height; x++) {
+				cv::Vec3b previous = image.at<cv::Vec3b>(x,0);
+				//for (int x = u; x < u + 1 && x < height; x++) {
+				for (int y = 1; y < width ; y++) {
+					cv::Vec3b current = image.at<cv::Vec3b>(x, y);
+					cv::Vec3b leftUp = image.at<cv::Vec3b>(x-1, y-1);
+					cv::Vec3b up = image.at<cv::Vec3b>(x-1, y);
+					//cv::Vec3b rightUp = image.at<cv::Vec3b>(x+1, y);
+					cv::Vec3b left = image.at<cv::Vec3b>(x, y-1);
+					//cv::Vec3b right = image.at<cv::Vec3b>(x, y+1);
+					//cv::Vec3b downLeft = image.at<cv::Vec3b>(x+1, y-1);
+					//cv::Vec3b down = image.at<cv::Vec3b>(x+1, y);
+					//cv::Vec3b downRight = image.at<cv::Vec3b>(x+1, y+1);
+					
+
+					cv::Vec3b newPixel;
+					for (int z = 0; z < 3; z++) {
+						short nearPixels = (leftUp[z] + up[z] + left[z]) / 3;
+						short difference = std::abs(current[z] - nearPixels);
+						//short difference = std::abs(current[z] - previous[z]);
+						if (difference < maxError) {
+							newPixel[z] = nearPixels;
+						}
+						else {
+							newPixel[z] = current[z];
+						}
+					}
+
+					image.at<cv::Vec3b>(x, y) = newPixel;
+					//previous = newPixel;
+				}
+			}
+
+			cv::imwrite("testing_nearlossless.bmp", image);
+
+
+			break;
 		}
 
+		case 8: {
+			std::cout << "SSIM\t" << Utility::SSIM("testing.bmp", "testing.bmp");
+			break;
+		}
 		//case 90: {
 		//	std::string file1 = Utility::getImage();
 

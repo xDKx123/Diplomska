@@ -10,6 +10,7 @@
 #include <opencv2/highgui.hpp>
 
 #include "SelectedFilter.h"
+#include "Configuration.h"
 
 #define MODULUS 256
 
@@ -40,7 +41,7 @@ private:
 	void showImage();
 	int sumElementsInVector(std::vector<short> v);
 	std::vector<char> createCompressedVector(std::vector<short> v);
-	std::tuple<SelectedFilter, std::vector<short>> hevristics(std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth);
+	std::tuple<SelectedFilter, std::vector<short>> hevristics(std::vector<short> none, std::vector<short> sub, std::vector<short> up, std::vector<short> average, std::vector<short> paeth);
 
 	short filterNoneEncode();
 	short filterSubEncode(short  current, short  left);
@@ -54,14 +55,16 @@ private:
 	short filterUpDecode(short diff, short up);
 	short filterAverageDecode(short diff, short left, short up);
 	short filterPaethDecode(short diff, short left, short up, short leftup);
+
+	void nearLossless(Configuration* configuration);
 public:
 	static inline const cv::Vec3b nullCheck = NULL;
 	PNG_filters();
 	PNG_filters(std::string fileName);
 	~PNG_filters();
 
-	std::tuple<std::vector<SelectedFilter>, std::vector<short>> Encode();
-	cv::Mat Decode(int width, int height, std::vector<SelectedFilter> selectedFilter, std::vector<char> values);
+	std::tuple<std::vector<SelectedFilter>, std::vector<short>> Encode(Configuration* configuration);
+	cv::Mat Decode(int width, int height, std::vector<SelectedFilter> selectedFilter, std::vector<unsigned char> values);
 
 	cv::Size getSize();
 	cv::Mat getImage();
